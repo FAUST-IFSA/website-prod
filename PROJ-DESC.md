@@ -20,3 +20,6 @@ The project is to create the product landing page, develop a marketing strategy,
 Direct potential clients towards the autotune application (henceforth "the product") and convert clients of the product into paying customers (the product is free) via upselling music courses, studio time at Faust Studio, and other Faust Studio products. 
 
 The autotune tool will require an email signup to authenticate users, and those emails will be collected in a central location for us to reach out to later to advertise and promote the products mentioned in the previous paragraph. 
+
+
+Current development platform for the website (before release to a domain): Github Pages

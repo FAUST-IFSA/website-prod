@@ -8,7 +8,8 @@ Every free autotune site we looked at looks like a generic utility, so a warmer,
 - [Abbey Road](https://www.abbeyroad.com/the-studios): how they present rooms and services. Our "next step" section should feel like this.
 - [LA Studio](https://la-studio.cc/en/autotune): closest to our "try it" idea. Free to use, account only for more.
 - [Soundtrap](https://www.soundtrap.com/musicmakers): short hero, simple feature blocks, sample tracks to try.
-- [RysUpTune](https://rysupaudio.com/products/rysuptune): strength presets (Natural to Hard Tune), before/after player.
+- [RysUpTune](https://rysupaudio.com/products/rysuptune): strength presets (Natural to Hard Tune), before/after player. I like their plugin explanation.
+- (https://rysupaudio.com/pages/vocal-tuner): also their vocal tuner
 - [remove.bg](https://www.remove.bg/): the whole hero is one upload box.
 ## Principles
  

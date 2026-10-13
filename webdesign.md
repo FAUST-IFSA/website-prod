@@ -14,7 +14,6 @@ Every free autotune site we looked at looks like a generic utility, so a warmer,
 ## Principles
  
 - People can try the tool within seconds of landing.
-- Real Faust photos, no stock images.
 - Be clear about what's free and when we ask for an email.
 - Czech and English from the start.
 ## Try first, email at download
@@ -31,19 +30,18 @@ Needs to be agreed with the tool team, since they own the signup.
  
 ## Colors
  
-Just an idea [View the palette on Coolors](https://coolors.co/fcf8d4-291712-ad150f-0c39ba-9e5d33-7e7b73-e6b86a)
-[Coolors image picker](https://coolors.co/image-picker): upload a photo and pull colors from it.
-[Realtime Colors](https://www.realtimecolors.com/): shows your colors on a sample website.
-[WebAIM contrast checker](https://webaim.org/resources/contrastchecker/): checks that text is readable.
+- Just an idea for palette [Coolors](https://coolors.co/fcf8d4-291712-ad150f-0c39ba-9e5d33-7e7b73-e6b86a)
+- [Coolors image picker](https://coolors.co/image-picker): upload a photo and pull colors from it.
+- [Realtime Colors](https://www.realtimecolors.com/): shows your colors on a sample website.
+- [WebAIM contrast checker](https://webaim.org/resources/contrastchecker/): checks that text is readable.
 
  
 ## Fonts
- 
 | | Option A | Option B |
 |---|---|---|
-| Headings | Fraunces | DM Serif Display |
-| Body | Inter | Work Sans |
-| Labels | IBM Plex Mono | Space Mono |
+| Headings | [Fraunces](https://fonts.google.com/specimen/Fraunces) | [DM Serif Display](https://fonts.google.com/specimen/DM+Serif+Display) |
+| Body | [Inter](https://fonts.google.com/specimen/Inter) | [Work Sans](https://fonts.google.com/specimen/Work+Sans) |
+| Labels | [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono) | [Space Mono](https://fonts.google.com/specimen/Space+Mono) |
  
 ## Page sections
  

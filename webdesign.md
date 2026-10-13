@@ -31,17 +31,11 @@ Needs to be agreed with the tool team, since they own the signup.
  
 ## Colors
  
-Sampled from Faust's own photos.
- 
-| Color | Hex | Use |
-|---|---|---|
-| Curtain cream | `#FCF8D4` | background |
-| Walnut | `#291712` | text |
-| Book red | `#AD150F` | main button |
-| Speaker blue | `#0C39BA` | links |
-| Sofa brown | `#9E5D33` | headings |
-| Console grey | `#7E7B73` | borders |
-| Lamp amber | `#E6B86A` | waveform |
+Just an idea [View the palette on Coolors](https://coolors.co/fcf8d4-291712-ad150f-0c39ba-9e5d33-7e7b73-e6b86a)
+[Coolors image picker](https://coolors.co/image-picker): upload a photo and pull colors from it.
+[Realtime Colors](https://www.realtimecolors.com/): shows your colors on a sample website.
+[WebAIM contrast checker](https://webaim.org/resources/contrastchecker/): checks that text is readable.
+
  
 ## Fonts
  

@@ -56,4 +56,15 @@ Needs to be agreed with the tool team, since they own the signup.
 - Vintage direction: yes or no?
 - Which fonts?
 - Email at download: ask the tool team?
+
+## React tools
+
+- [Vite](https://vite.dev/): sets up the React project (works with GitHub Pages)
+- [shadcn/ui](https://ui.shadcn.com/): copy-paste components (buttons, FAQ accordion, dialogs)
+- [shadcn/ui Blocks](https://ui.shadcn.com/blocks): full page sections (hero, FAQ, footer)
+- [Radix UI](https://www.radix-ui.com/): unstyled, accessible components to style ourselves
+- [react-dropzone](https://react-dropzone.js.org/): upload box
+- [wavesurfer.js](https://wavesurfer.xyz/): waveform and before/after audio player
+- [react-i18next](https://react.i18next.com/): Czech/English switch
+- [Lucide](https://lucide.dev/): icons
  

@@ -13,7 +13,7 @@ export const en = {
   },
   hero: {
     eyebrow: 'Free vocal tuner · by Faust Studio, Prague',
-    heading: 'Tune your vocal in your browser. Free.',
+    heading: 'Tune your vocal in your browser, for free!',
     lead: 'See every note you sang, tune them in one click or by hand, and download the result.',
     cta: 'Try it free',
     meta: 'Opens the tuner · WAV, MP3, OGG or FLAC · up to 100 MB',

@@ -94,9 +94,11 @@ TODO.md                 old team todo list (mostly superseded)
   Pages → Source must be "GitHub Actions" (already set). No secrets needed now that both repos are public.
 - **Base path:** `site.config.json` → `base` (`/website-prod/`). It's the only place it lives. `vite.config.ts`
   and `build-tool.mjs` read it, and code uses `import.meta.env.BASE_URL`. Never hard-code `/website-prod/`.
-- **noindex (demo only):** both the landing page and `dist/tool/index.html` (injected by `build-tool.mjs`) carry
-  `<meta name="robots" content="noindex, nofollow">`. Remove it before a real launch. Don't use a robots.txt
-  Disallow: it would hide the noindex from crawlers.
+- **noindex (demo only):** `site.config.json` → `"noindex": true` is the single switch. It injects
+  `<meta name="robots" content="noindex, nofollow">` into the landing page (a `transformIndexHtml` plugin in
+  `vite.config.ts`) and into `dist/tool/index.html` (`build-tool.mjs`, which fails the build unless the tool's
+  HTML has exactly one `<head>`). Set it to `false` for a real launch. Don't use a robots.txt Disallow: it would
+  hide the noindex from crawlers.
 - **Later (production):** probably Vercel + a custom domain. Set `base` to `/`, remove the noindex, and the
   same build works. No Next.js: the team chose Vite to match the tool.
 - **GitHub Pages limits:** static files only. No server, no custom headers, no SPA fallback. So: no

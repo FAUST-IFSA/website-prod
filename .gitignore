@@ -1,36 +1,27 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
+node_modules
 
-# testing
-/coverage
+# build output (landing page + dist/tool/)
+dist
 
-# next.js
-/.next/
-/out/
+# pinned autotuner checkout and its build artifacts (scripts/build-tool.mjs)
+.autotuner/
 
-# production
-/build
+# typescript
+*.tsbuildinfo
 
-# misc
-.DS_Store
-*.pem
+# logs
+*.log
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
+# env files
 .env
+.env*.local
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# misc
+.DS_Store
+# Office lock files (e.g. ~$oposal.docx)
+~$*
+*.pem

@@ -12,7 +12,7 @@ dist
 
 # logs
 *.log
-
+CLAUDE.md
 # env files
 .env
 .env*.local

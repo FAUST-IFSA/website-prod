@@ -19,6 +19,9 @@ npm run lint
 `site.config.json` is the only place for:
 
 - `base`: the URL path the site is served under. `/website-prod/` for GitHub Pages; `/` for Vercel or a custom domain.
+- `noindex`: `true` adds `<meta name="robots" content="noindex, nofollow">` to the landing page and the tool, because
+  this is a client demo. Set it to `false` for production. (There's deliberately no robots.txt `Disallow`: it would
+  stop crawlers from ever seeing the noindex tag.)
 - `autotuner.commit`: the autotuner commit to ship (full SHA, currently from branch `aidan/pitch-engine`). To ship a
   new tool version, change only this.
 

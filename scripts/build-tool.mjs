@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const root = path.resolve(import.meta.dirname, '..')
-const { base, autotuner } = JSON.parse(fs.readFileSync(path.join(root, 'site.config.json'), 'utf8'))
+const { base, noindex, autotuner } = JSON.parse(fs.readFileSync(path.join(root, 'site.config.json'), 'utf8'))
 const src = path.join(root, '.autotuner')
 const stamp = path.join(src, 'node_modules', '.installed-commit')
 
@@ -28,4 +28,14 @@ if (read(stamp) !== autotuner.commit) {
   run('npm', ['ci'])
   fs.writeFileSync(stamp, autotuner.commit)
 }
-run('npm', ['exec', '--', 'vite', 'build', `--base=${base}tool/`, '--outDir', path.join(root, 'dist', 'tool'), '--emptyOutDir'])
+const outDir = path.join(root, 'dist', 'tool')
+run('npm', ['exec', '--', 'vite', 'build', `--base=${base}tool/`, '--outDir', outDir, '--emptyOutDir'])
+
+// Client demo: keep search engines out of the tool page too (the landing page links to it). We can't change the
+// tool's repo, so the tag goes into its built HTML. Set "noindex": false in site.config.json for production.
+if (noindex) {
+  const html = path.join(outDir, 'index.html')
+  const parts = fs.readFileSync(html, 'utf8').split('<head>')
+  if (parts.length !== 2) throw new Error(`noindex: expected exactly one <head> in ${html}, found ${parts.length - 1}`)
+  fs.writeFileSync(html, parts.join('<head>\n    <meta name="robots" content="noindex, nofollow" />'))
+}

@@ -6,5 +6,14 @@ import site from './site.config.json' with { type: 'json' }
 export default defineConfig({
   // The base path lives only in site.config.json; scripts/build-tool.mjs reads it too.
   base: site.base,
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Client demo: keep search engines out. Set "noindex": false in site.config.json for production.
+    // scripts/build-tool.mjs adds the same tag to the tool's page.
+    {
+      name: 'noindex',
+      transformIndexHtml: () =>
+        site.noindex ? [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex, nofollow' }, injectTo: 'head' }] : [],
+    },
+  ],
 })

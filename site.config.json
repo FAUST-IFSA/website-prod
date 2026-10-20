@@ -1,5 +1,6 @@
 {
   "base": "/website-prod/",
+  "noindex": true,
   "autotuner": {
     "repo": "https://github.com/FAUST-IFSA/autotuner.git",
     "commit": "e25527921e967df67d86a0b20cb425bd92cfe2e6"

@@ -117,7 +117,7 @@ use `tabular-nums`.
 - Radii: `--radius-sm: 2px` (buttons), `--radius-md: 4px` (cards, hero box, player), and
   `--radius-full: 999px` (round play buttons only). Faust is square-edged, so use nothing larger.
 - Rules: `--rule: 2px solid var(--ink)` above each step and as the top edge of the player.
-- Brand bar: a 6 px `--rust` bar across the very top of the page, above the header.
+- Brand bar: none. The 6 px `--rust` bar above the header was removed (user decision, 2026-10-20).
 - Motion: color, border and background transitions are `150ms ease`. Card image hover is
   `transform: scale(1.02)` over 300 ms. Under `prefers-reduced-motion: reduce`, drop all transforms.
 - Focus: `:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }`. On dark bands use
@@ -169,7 +169,7 @@ line art, matched to their scale approximately, as the user asked.
 | | fauststudio.net | Ours, ≥640 px | Ours, <640 px (incl. 375) |
 |---|---|---|---|
 | Layout | 1280: emblem left, text right. Mobile: stacked, centered | Row: lockup left, `EN \| CS` right | Stacked, centered lockup. Switch pinned top-right |
-| Header height | 89 px (no rust bar) | 6 px rust bar + **82 px** row + 1 px border = **89 px** | rust bar + 12 px top, emblem, 12 px gap, text, 16 px bottom ≈ **135 px** |
+| Header height | 89 px (no rust bar) | **88 px** row + 1 px border = **89 px** (no rust bar) | 12 px top, emblem, 12 px gap, text, 16 px bottom + 1 px border ≈ **129 px** (no rust bar) |
 | Emblem | 57 × 57 | **56 × 56** | **64 × 64** (theirs ≈ 70 on a 375 screen) |
 | Emblem → text gap | 25 px horizontal | **24 px** (`--space-5`) | **12 px** vertical (`--space-3`) |
 | Text | "Faust Records", P22 Constructivist Square 400, 22 px, normal tracking, capitals from the font, #403F3D | "Faust Studio", **Russo One 400, 24.8 px** (`1.55rem`), `letter-spacing: 0.04em`, `text-transform: uppercase`, `line-height: 1`, `--ink-2` | Same font and color, **24 px** (`1.5rem`) |
@@ -192,6 +192,12 @@ line art, matched to their scale approximately, as the user asked.
 - **Brand name in one place:** move the "Faust Studio" string into `faust.ts` (`faust.brandName`) and use it in
   the header and footer. Switching to an exact match ("FAUST RECORDS", which is still the naming
   `TODO(verify)`) is then a one-line change.
+- **Lockup position, ≥640 px** (user request, 2026-10-20, measured against fauststudio.net at 1280): the emblem
+  sits at (70, 8) relative to the header, 10 px left of the container edge; the gap is 25 px; the wordmark
+  baseline is at y = 56, so the text sits lower than the emblem's centre, as on their site. This replaces
+  "centred on the row" and the 24 px gap above. Below 640 px is unchanged.
+- **No rust bar** (user decision, 2026-10-20): the header has no colored strip on top at any width, like
+  fauststudio.net. The desktop row grows from 82 to 88 px, so the total stays 89 px.
 - **Header wordmark reads "FAUST RECORDS"** (user decision, 2026-10-20): `faust.headerBrandName`, a one-line
   switch used only by the header. The footer wordmark and all copy (meta, alt text, copyright, §5) still say
   "Faust Studio"; naming overall is still the `TODO(verify)`. At 1280 "FAUST RECORDS" is about 221 px wide.

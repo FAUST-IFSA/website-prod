@@ -239,7 +239,6 @@ a.btn-primary:active {
 /* ---------- §3.2 Header (sized to the fauststudio.net banner; not sticky) ---------- */
 
 .site-header {
-  border-top: 6px solid var(--rust);
   border-bottom: 1px solid var(--line);
 }
 /* Below 640: stacked, centered lockup; the switch is pinned top-right. DOM order (and tab order) is unchanged. */
@@ -279,24 +278,33 @@ a.btn-primary:active {
   right: calc(-1 * var(--space-2));
 }
 @media (min-width: 640px) {
-  /* 6 px rust bar + 82 px row + 1 px border = 89 px, the fauststudio.net banner height. */
+  /* 88 px row + 1 px border = 89 px, the fauststudio.net banner height. */
   .header-row {
     flex-direction: row;
     justify-content: space-between;
     gap: var(--space-4);
-    min-height: 82px;
+    min-height: 88px;
     padding: 0;
   }
+  /* Lockup positions measured against fauststudio.net at 1280 (user request, 2026-10-20): logo at (70, 8),
+     25 px gap, text baseline at y=56, so the text sits lower than the logo's centre, as on their site.
+     -10 px puts the logo 10 px left of the container edge (theirs is at x=70; our container starts at 80). */
   .brand {
     flex-direction: row;
-    gap: var(--space-5);
+    align-self: stretch;
+    align-items: flex-start;
+    gap: 25px;
+    margin-left: -10px;
   }
   .brand img {
     width: 56px;
     height: 56px;
+    margin-top: 8px;
   }
   .header-row .wordmark {
     font-size: 1.55rem;
+    /* Russo One's baseline sits 20 px below the top of this 24.8 px line box: 36 + 20 = 56. */
+    margin-top: 36px;
   }
   .header-row .lang-switch {
     position: static;

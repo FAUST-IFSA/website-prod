@@ -1,3 +1,5 @@
+import emblem1x from '../assets/faust-dark-96.webp'
+import emblem2x from '../assets/faust-dark-192.webp'
 import { LangSwitch, Outbound } from '../components'
 import { faust } from '../faust'
 import { useCopy } from '../i18n'
@@ -9,8 +11,17 @@ export function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div>
-            {/* TODO(asset A1): replace the wordmark with the Faust logo (light version, alt "Faust Studio"). */}
-            <p className="wordmark">Faust Studio</p>
+            {/* Decorative emblem (alt=""): the wordmark text below names the brand. */}
+            <img
+              className="footer-emblem"
+              src={emblem1x}
+              srcSet={`${emblem1x} 1x, ${emblem2x} 2x`}
+              width={96}
+              height={96}
+              alt=""
+              loading="lazy"
+            />
+            <p className="wordmark">{faust.brandName}</p>
             <p className="muted">{footer.description}</p>
             <p className="footer-home">
               <Outbound href={faust.home}>fauststudio.net</Outbound>

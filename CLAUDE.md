@@ -117,14 +117,17 @@ TODO.md                 old team todo list (mostly superseded)
 - **Studio facts:** take them only from fauststudio.net (founded 1991 by Richard Mader, per `/kopie-about`).
   Mark anything unconfirmed `TODO(verify)`. The copyright is "© 2026 Faust Studio" (decided by the user).
 - **TODO tags in source:** `TODO(verify)` facts/prices/naming, `TODO(email)`, `TODO(name)`, `TODO(audio)`
-  before/after samples, `TODO(asset A1–A5)` logo/photos, `TODO(cs-review)`. Grep for them before any client
+  before/after samples, `TODO(asset A3–A5)` photos, `TODO(cs-review)`. Grep for them before any client
   handover.
 
 ## Design
 
 - **Source of truth:** `docs/design-spec.md`. The look follows fauststudio.net: cream `--paper #FFFDF4`, ink
   `#151515`, rust `--rust #BF3C19`, black "night" bands for the studio section and footer. Fonts are Jost
-  Variable + Barlow Semi Condensed, self-hosted via Fontsource (no Google Fonts requests). Icons: lucide-react.
+  Variable + Barlow Semi Condensed, self-hosted via Fontsource (no Google Fonts requests). The header/footer
+  wordmark uses Russo One (`--font-brand`), a stand-in for fauststudio.net's "P22 Constructivist Square". That
+  font is a demo copy not licensed for commercial use or embedding, so never self-host or trace it. The header
+  matches fauststudio.net's proportions on desktop (89 px tall) and stacks on mobile (design-spec §3.2). Icons: lucide-react.
 - **Tokens:** use the CSS custom properties in `src/index.css`, not raw values. Light theme only. All text pairs
   pass WCAG AA. Keep them that way.
 - **Accessibility:**
@@ -145,17 +148,24 @@ TODO.md                 old team todo list (mostly superseded)
   the designer. Use the existing sessions; don't spawn subagents for role work.
 - **Git:** commit or push only when the user asks. Fast-forward only, no force-push. Stage files by explicit
   path. Commit messages end with the Co-Authored-By line the session provides.
-- **Untracked by design:** this file (`CLAUDE.md`) is in `.gitignore`, so it's local-only and won't be pushed
-  unless that changes. Office lock files (`~$*`) are ignored too.
+- **This file is tracked and shared** with both teams. Keep it current when the setup changes. Office lock files
+  (`~$*`) are gitignored.
+- **The user pushes:** prepare changes in the working tree and hand the user an explicit `git add` path list.
+  Don't commit or push unless the user says so for that change.
 
 ## Open decisions / known gaps
 
 - **Email collection:** where signup emails are stored. The tool's email gate is still a client-side stub with
   no backend, and GitHub Pages can't host one. This blocks the automation deliverable.
-- **Naming:** "Faust Studio" vs "Faust Records" (the client site uses both). Also the session/course prices
+- **Naming:** "Faust Studio" vs "Faust Records" (the client site uses both). The user's call so far: only the
+  header wordmark reads "FAUST RECORDS", matching fauststudio.net. The footer, copy, title and copyright stay
+  "Faust Studio" until this is settled. Also the session/course prices
   (~1,000 / 700 CZK/h) and the number of studios (2 or 3?).
 - **The word "autotune"** in copy (a trademark vs search-traffic tradeoff). Put it to the client.
-- **Assets:** A1–A7 from design-spec §6: logo, 4 photos, before/after vocal with singer consent, OG image.
+- **Assets:** from design-spec §6, still missing: photos A3–A5, the before/after vocal with singer consent (A6),
+  and the OG image (A7). The A1 logo is in `src/assets/` as the Faust building line art (`faust-light.png` for
+  paper, `faust-dark.png` for night bands, with resized WebP copies), used in the header, the footer and the
+  studio band. It replaces the A2 photo. A ≥1024 px or SVG version of the art would make it sharp on retina.
 - **Visual jump:** the tool's dark system-ui look clashes with the landing page. That's for the tool team.
 - **v2 ideas parked:**
   - a real upload box in the hero that hands the file to the tool (possible via shared-origin IndexedDB, but it

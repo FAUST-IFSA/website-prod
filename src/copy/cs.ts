@@ -28,7 +28,7 @@ export const cs: Copy = bindOneLetterWords({
   },
   hero: {
     eyebrow: 'Ladění zpěvu zdarma · od Faust Studia, Praha',
-    heading: 'Nalaďte svůj zpěv v prohlížeči. Zdarma.',
+    heading: 'Nalaďte svůj zpěv v prohlížeči, zdarma!',
     lead: 'Uvidíte každou notu, kterou jste zazpívali, nalaďte je jedním kliknutím nebo ručně a stáhněte si výsledek.',
     cta: 'Vyzkoušet zdarma',
     meta: 'Otevře nástroj · WAV, MP3, OGG nebo FLAC · do 100 MB',
@@ -90,7 +90,8 @@ export const cs: Copy = bindOneLetterWords({
       { label: 'O studiu', href: faust.about },
       { label: 'Všechny reference', href: faust.references },
     ],
-    photo: 'Foto: režie Blue Studia',
+    // The art's sign reads "FAUST RECORDS"; the alt says "Faust Studio" until the naming TODO(verify) is settled.
+    artAlt: 'Kresba budovy Faust Studia, zaoblené funkcionalistické nárožní budovy, při pohledu z ulice.',
   },
   next: {
     eyebrow: 'Další krok',

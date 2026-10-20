@@ -21,6 +21,8 @@
   /* §1.3 type */
   --font-sans: 'Jost Variable', Jost, Futura, 'Century Gothic', system-ui, sans-serif;
   --font-label: 'Barlow Semi Condensed', 'DIN Alternate', 'Arial Narrow', sans-serif;
+  /* Wordmark only (header and footer). Stand-in for fauststudio.net's unlicensed demo font; never use that. */
+  --font-brand: 'Russo One', 'Barlow Semi Condensed', sans-serif;
   --text-display: clamp(2.5rem, 1.6rem + 4vw, 4.5rem);
   --text-h2: clamp(2rem, 1.5rem + 2vw, 3rem);
   --text-h3: 1.375rem;
@@ -234,27 +236,72 @@ a.btn-primary:active {
   color: var(--paper);
 }
 
-/* ---------- §3.2 Header ---------- */
+/* ---------- §3.2 Header (sized to the fauststudio.net banner; not sticky) ---------- */
 
 .site-header {
   border-top: 6px solid var(--rust);
   border-bottom: 1px solid var(--line);
 }
+/* Below 640: stacked, centered lockup; the switch is pinned top-right. DOM order (and tab order) is unchanged. */
 .header-row {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  min-height: 64px;
+  padding: var(--space-3) 0 var(--space-4);
+}
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.brand img {
+  display: block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
 }
 .wordmark {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font: 600 0.9375rem / 1 var(--font-label);
-  letter-spacing: 0.14em;
+  font: 400 1.5rem / 1 var(--font-brand);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  text-decoration: none;
+  color: var(--ink-2);
+}
+/* Keeps the stacked lockup centered when large text wraps the wordmark onto two lines. */
+.header-row .wordmark {
+  text-align: center;
+}
+/* -8 px pulls the buttons' side padding back so the labels line up with the gutter. */
+.header-row .lang-switch {
+  position: absolute;
+  top: var(--space-3);
+  right: calc(-1 * var(--space-2));
+}
+@media (min-width: 640px) {
+  /* 6 px rust bar + 82 px row + 1 px border = 89 px, the fauststudio.net banner height. */
+  .header-row {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 82px;
+    padding: 0;
+  }
+  .brand {
+    flex-direction: row;
+    gap: var(--space-5);
+  }
+  .brand img {
+    width: 56px;
+    height: 56px;
+  }
+  .header-row .wordmark {
+    font-size: 1.55rem;
+  }
+  .header-row .lang-switch {
+    position: static;
+    margin-right: calc(-1 * var(--space-2));
+  }
 }
 .skip-link {
   position: absolute;
@@ -276,9 +323,6 @@ a.btn-primary:active {
   display: flex;
 }
 /* Pull the buttons' 8 px side padding back so the labels line up with the container edge. */
-.header-row .lang-switch {
-  margin-right: calc(-1 * var(--space-2));
-}
 .footer .lang-switch {
   margin-left: calc(-1 * var(--space-2));
 }
@@ -588,18 +632,22 @@ a.btn-primary:active {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.night .photo-placeholder {
-  border-color: var(--night-line);
-  background: var(--night-2);
-  color: var(--mist);
-}
-.studio-photo {
-  aspect-ratio: 3 / 2;
-  border-radius: var(--radius-md);
+/* The building art is bottom-anchored: a negative margin equal to the section's bottom padding puts its
+   cut-off base exactly on the band's bottom edge (design-spec §4.4). */
+.studio-art {
+  display: block;
+  justify-self: center;
+  align-self: end;
+  width: 240px;
+  height: auto;
+  margin-bottom: calc(-1 * var(--space-8));
 }
 @media (min-width: 1024px) {
-  .studio-photo {
-    aspect-ratio: 4 / 3;
+  .studio-art {
+    grid-row: 1;
+    grid-column: 1;
+    width: min(100%, 360px);
+    margin-bottom: calc(-1 * var(--space-9));
   }
 }
 .studio-text .section-head {
@@ -787,8 +835,14 @@ details[open] .faq-icon {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+.footer-emblem {
+  display: block;
+  margin-bottom: var(--space-4);
+}
 .footer .wordmark {
   margin-bottom: var(--space-3);
+  font-size: 1.25rem;
+  color: var(--paper);
 }
 .footer .label {
   margin-bottom: var(--space-2);

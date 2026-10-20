@@ -161,13 +161,54 @@ Write button labels as verbs, and don't let them wrap: no fixed widths. Czech st
 
 ### 3.2 Header (all viewports)
 
-- 6 px rust bar, then a 64 px header on `--paper` with a 1px `--line` bottom border. Not sticky.
-- Left: Faust logo, 28 px tall, **not a link**. This page is the home page, and an off-site first link would
-  pull people out of the funnel before the CTA. fauststudio.net is linked from the footer. Until the logo
-  arrives, use the placeholder wordmark "Faust Studio" (Barlow Semi Condensed 600, 15 px,
-  `letter-spacing: 0.14em`, uppercase via CSS).
-- Right: language switch `EN | CS`.
-- First focusable element: a skip link, "Skip to main content", visually hidden until focused.
+Matches the fauststudio.net top banner in size and shape (researcher's measurements, 2026-10-20). Their
+wordmark font is a P22 Constructivist Square *demo* copy (not licensed for embedding). **Never self-host or trace
+it.** Russo One (OFL) is our stand-in. Their logo is a different file (a JPG on a white square). Ours is the A1
+line art, matched to their scale approximately, as the user asked.
+
+| | fauststudio.net | Ours, ≥640 px | Ours, <640 px (incl. 375) |
+|---|---|---|---|
+| Layout | 1280: emblem left, text right. Mobile: stacked, centered | Row: lockup left, `EN \| CS` right | Stacked, centered lockup. Switch pinned top-right |
+| Header height | 89 px (no rust bar) | 6 px rust bar + **82 px** row + 1 px border = **89 px** | rust bar + 12 px top, emblem, 12 px gap, text, 16 px bottom ≈ **135 px** |
+| Emblem | 57 × 57 | **56 × 56** | **64 × 64** (theirs ≈ 70 on a 375 screen) |
+| Emblem → text gap | 25 px horizontal | **24 px** (`--space-5`) | **12 px** vertical (`--space-3`) |
+| Text | "Faust Records", P22 Constructivist Square 400, 22 px, normal tracking, capitals from the font, #403F3D | "Faust Studio", **Russo One 400, 24.8 px** (`1.55rem`), `letter-spacing: 0.04em`, `text-transform: uppercase`, `line-height: 1`, `--ink-2` | Same font and color, **24 px** (`1.5rem`) |
+| Vertical align | logo top 8, text lower | Emblem and text centered on the row | — |
+| Sticky | yes | **no** (see below) | **no** |
+
+- Russo One at 24.8 px + 0.04em matches the original's width (220 px for "FAUST RECORDS") and cap height
+  (17.6 px). Differences: the original A has no crossbar, and its letters are slightly more square.
+- Token: `--font-brand: 'Russo One', 'Barlow Semi Condensed', sans-serif`. Load with
+  `@fontsource/russo-one/400.css` (OFL; npm 5.3.0). Use it **only** for the wordmark, in the header and footer.
+- The lockup is **not a link**: the home page has no off-site first tab stop (unchanged). The emblem is `alt=""`.
+  The DOM order stays skip link → lockup → switch, so the tab order is unchanged.
+- <640 px: `.header-row` becomes `flex-direction: column; align-items: center` with the padding above. The switch
+  is `position: absolute; top: 12px; right: -8px` inside the `position: relative` header row. The row is the
+  `.container`, which already sits inside the gutter, so −8 px lines the labels up with the gutter edge. The
+  wordmark gets `text-align: center`, so a two-line wrap at 200% text stays centered under the emblem.
+- Emblem files: one `<img>` with `srcset` `faust-light-64.webp 1x, faust-light-128.webp 2x` and
+  `width`/`height` 64. CSS sets 56 × 56 at ≥640. Generate both from the 512 px original the same way as before,
+  and delete the now-unused `faust-light-44`/`-88`.
+- **Brand name in one place:** move the "Faust Studio" string into `faust.ts` (`faust.brandName`) and use it in
+  the header and footer. Switching to an exact match ("FAUST RECORDS", which is still the naming
+  `TODO(verify)`) is then a one-line change.
+- **Header wordmark reads "FAUST RECORDS"** (user decision, 2026-10-20): `faust.headerBrandName`, a one-line
+  switch used only by the header. The footer wordmark and all copy (meta, alt text, copyright, §5) still say
+  "Faust Studio"; naming overall is still the `TODO(verify)`. At 1280 "FAUST RECORDS" is about 221 px wide.
+- **Footer:** the footer wordmark uses the same `--font-brand` at 20 px, `--paper`, for consistency.
+
+**Accessibility calls (where we differ from fauststudio.net, and why):**
+- **Not sticky:** their header is pinned. At 135 px on a 375 × 667 phone it would cover about 20% of the
+  screen for the whole visit, and with 200% text it would cover much more (WCAG 1.4.10 reflow risk). Ours scrolls
+  away.
+- **No side-by-side at 375:** emblem + text + switch need about 408 px. Stacking (as their own mobile site
+  does) keeps the no-horizontal-scroll rule. Cost: the phone header grows from 71 to about 135 px. The hero box
+  still starts above the fold on a 375 × 667 screen.
+- **Color:** `--ink-2` #403F3D on paper is 10.3:1, the same as their desktop color. Their mobile uses near-black;
+  we keep one value.
+- **Tap targets:** the language buttons stay 44 × 44. At 200% text the switch must not overlap the emblem; at
+  375 the emblem spans x≈155–219 and the switch starts at x≈255 or more.
+- The skip link and the 3 px focus ring are unchanged.
 
 ### 3.3 Language switch
 
@@ -284,13 +325,18 @@ width on the second line, and the time sits right-aligned on the third. Card pad
 
 **Layout, desktop:** `--night` background, `--paper` text, and a 2-column grid of 6 and 6 columns with a
 64 px gap, vertically centered.
-- Left: studio photo, 4:3, `--radius-md`, `object-fit: cover`.
+- Left: the building illustration (A1, `faust-dark`, white line art), 1:1, `width: min(100%, 360px)`,
+  centered in its column. It is **bottom-anchored**: `align-self: end` plus a negative bottom margin equal to
+  the section's bottom padding (`calc(-1 * var(--space-9))` at ≥1024), so the building's cut-off base sits
+  on the band's bottom edge and the building appears to rise out of it. This matches the art's street-level
+  view. No radius and no border.
 - Right: eyebrow (`--ember`), h2, two body paragraphs (`--paper`, second one `--mist`).
 - Below them, a 3-up stats row: number in `--text-stat`, label in `--text-label` `--mist`, separated by
   1 px `--night-line` vertical rules.
 - Below the stats, a "Recorded here" line, then two outbound links.
 
-**Mobile:** the photo comes first, full width at 3:2. Then the text. Stats become a 1-column list: each row is
+**Below 1024 (one column):** the text comes first and the illustration last, centered at `width: 240px` with
+48 px above it. It's bottom-anchored the same way (`margin-bottom: calc(-1 * var(--space-8))`). Stats become a 1-column list: each row is
 the number on the left and the label on the right, divided by a 1 px `--night-line` line.
 
 ### 4.5 Next step
@@ -332,8 +378,10 @@ Closing row (48 px below the cards, left-aligned, wrapping): primary button **"B
 
 **Layout:** `--night` background, `--paper`/`--mist` text, padding 64 top/32 bottom. At ≥768 it's a
 3-column grid; at 375 it's 1 column with a 32 px gap.
-1. Logo (placeholder wordmark in `--paper`, not a link), then a one-line description in `--mist`, then the
-   outbound link "fauststudio.net ↗" → `https://www.fauststudio.net/`.
+1. The building emblem (A1, `faust-dark`) at **96 × 96 px**, `alt=""`, not a link. Then 16 px of space, the
+   wordmark text "Faust Studio" in `--paper` (not a link), the one-line description in `--mist`, and the
+   outbound link "fauststudio.net ↗" → `https://www.fauststudio.net/`. At 375 px it's the same size,
+   left-aligned.
 2. Contact: the "Contact and booking" link, email (`mailto:`), phone (`tel:`) and address.
 3. Language switch (night variant), then Instagram and Facebook links.
 
@@ -357,11 +405,12 @@ word appears only in the meta description, for search.
 
 **Header**
 - Skip link: Skip to main content
-- Logo alt: Faust Studio
+- Emblem alt (header and footer): "" (decorative; the wordmark text next to it names the brand)
 
 **Hero**
 - Eyebrow: Free vocal tuner · by Faust Studio, Prague
-- H1: Tune your vocal in your browser. Free.
+- H1: Tune your vocal in your browser, for free! (Changed by the user on 2026-10-20, commit `49f1013`; was
+  "Tune your vocal in your browser. Free." The CS h1 follows: "Nalaďte svůj zpěv v prohlížeči, zdarma!")
 - Lead: See every note you sang, tune them in one click or by hand, and download the result.
 - Box button: Try it free
 - Box meta: Opens the tuner · WAV, MP3, OGG or FLAC · up to 100 MB
@@ -401,6 +450,9 @@ word appears only in the meta description, for search.
   the Velvet Revolution." Home page says "35 years of music", which is consistent.): Studio Faust Records was founded in 1991 by musician Richard Mader, two years after the Velvet
   Revolution. It sits in a functionalist building near Prague Castle and has two studios. Underneath them
   runs a 300 m² concrete labyrinth where whole bands record live.
+- Building illustration alt: Line drawing of the Faust Studio building, a curved functionalist corner
+  building, seen from the street. (The art's sign reads "FAUST RECORDS"; the alt says "Faust Studio" per the
+  naming `TODO(verify)`.)
 - P2: The Blue Studio is built around an SSL 4000E console with a Neve front end and a Steinway grand. The
   Green Studio has 80-year-old hardwood floors and a 1935 Hofmann grand piano.
 - Stats: **1991** Founded · **2** Studios · **300 m²** Underground live space
@@ -478,23 +530,27 @@ Faust Studio (or approve it) with permission to use it.
 
 | # | Asset | Where | Spec | Alt text |
 |---|---|---|---|---|
-| A1 | Faust logo, SVG (or PNG at 2×) | Header, footer | Dark version for paper and light version for night | "Faust Studio" |
-| A2 | Blue Studio control room photo (the site's main photo with the SSL desk, red leather chair and brick wall is ideal) | Studio section | ≥1600 × 1200, landscape | "The Blue Studio control room at Faust Studio, with an SSL mixing console and vintage gear" |
+| A1 ✅ | Building emblem: `src/assets/faust-light.png` (black, for paper) and `faust-dark.png` (white, for night), 512 × 512 PNG | Header 44 px, footer 96 px, studio section 360 px (240 px below 1024) | Received 2026-10-20. Nice to have: an SVG or ≥1024 px export, since 360 px at 2× needs 720 px and 512 is slightly soft | Header/footer `""`; studio: see §5 |
+| A2 | Blue Studio control room photo | Optional now: the studio slot uses the A1 illustration. Use it for A7 if supplied | ≥1600 × 1200, landscape | n/a |
 | A3 | Blue Studio photo (different angle or the live room) | Next step card 1 | ≥1200 × 900 | "" (decorative; the card title names it) |
 | A4 | Green Studio photo | Next step card 2 | ≥1200 × 900 | "" |
 | A5 | Course or session in progress (people, synth lab) | Next step card 3 | ≥1200 × 900 | "" |
 | A6 | Before/after audio: the same vocal take, raw and tuned | Before/after | 15–30 s each, MP3 192 kbps, loudness-matched, signed singer consent | n/a (labelled by row) |
-| A7 | Social share image (optional) | `og:image` | 1200 × 630, A2 cropped with the logo | n/a |
+| A7 | Social share image (optional) | `og:image` | 1200 × 630, A2 cropped with the emblem, or the A1 illustration on `--paper` with the wordmark | n/a |
 
 Export photos as AVIF/WebP with a JPEG fallback and set `width`/`height`. Images below the hero are lazy
 loaded. Photos are not filtered or tinted. The warmth comes from the photography itself.
 
 **Placeholder treatment (use until assets arrive):**
 - Images: a `<div>` with the same aspect ratio, `--paper-2` background (`--night-2` on night) and a 1 px
-  dashed `--line-strong` border (`--night-line` on night). Center the label `PHOTO: BLUE STUDIO CONTROL ROOM`
-  in `--text-label` `--ink-3` (`--mist` on night). Mark it `aria-hidden="true"` and add a `TODO(asset A2)`
+  dashed `--line-strong` border (`--night-line` on night). Center the label (e.g. `PHOTO: BLUE STUDIO`) in
+  `--text-label` `--ink-3` (`--mist` on night). Mark it `aria-hidden="true"` and add a `TODO(asset A3/A4/A5)`
   comment.
-- Logo: the text wordmark in §3.2.
+- Logo: done (A1). Remove the `TODO(asset A1)` markers.
+- **A1 display copies:** keep the 512 px originals and generate them once (committed, no build-time image
+  pipeline). Use WebP lossless with alpha: header `light` at 44 and 88 px (1x/2x), footer `dark` at 96 and
+  192 px, studio `dark` at 360 and the original 512 px (`srcset` 1x/2x). Set `width`/`height` on every `<img>`.
+  The header emblem is eager-loaded; the footer and studio art use `loading="lazy"`.
 - Audio: the disabled player state in §4.3.
 
 ---

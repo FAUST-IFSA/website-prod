@@ -1,4 +1,6 @@
-import { Outbound, PhotoPlaceholder, SectionHead } from '../components'
+import art1x from '../assets/faust-dark-360.webp'
+import art2x from '../assets/faust-dark-512.webp'
+import { Outbound, SectionHead } from '../components'
 import { faust } from '../faust'
 import { useCopy } from '../i18n'
 
@@ -7,9 +9,6 @@ export function Studio() {
   return (
     <section className="section night" aria-labelledby="studio-heading">
       <div className="container studio-grid">
-        {/* TODO(asset A2): Blue Studio control room photo, ≥1600×1200, alt "The Blue Studio control room at Faust
-            Studio, with an SSL mixing console and vintage gear". */}
-        <PhotoPlaceholder label={studio.photo} className="studio-photo" />
         <div className="studio-text">
           <SectionHead id="studio-heading" eyebrow={studio.eyebrow} title={studio.heading} />
           <p>{studio.body[0]}</p>
@@ -34,6 +33,17 @@ export function Studio() {
             ))}
           </p>
         </div>
+        {/* After the text in the DOM (reading order and the one-column layout); placed in the left column at ≥1024.
+            Its cut-off base sits on the band's bottom edge (design-spec §4.4). */}
+        <img
+          className="studio-art"
+          src={art1x}
+          srcSet={`${art1x} 1x, ${art2x} 2x`}
+          width={360}
+          height={360}
+          alt={studio.artAlt}
+          loading="lazy"
+        />
       </div>
     </section>
   )

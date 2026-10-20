@@ -1,4 +1,7 @@
+import emblem1x from '../assets/faust-light-64.webp'
+import emblem2x from '../assets/faust-light-128.webp'
 import { LangSwitch } from '../components'
+import { faust } from '../faust'
 import { useCopy } from '../i18n'
 
 export function Header() {
@@ -9,9 +12,12 @@ export function Header() {
         {header.skip}
       </a>
       <div className="container header-row">
-        {/* Plain text, not a link: this is the home page, and an off-site first tab stop would pull people away
-            before the CTA. TODO(asset A1): replace with the Faust logo (dark version, 28 px tall, alt "Faust Studio"). */}
-        <p className="wordmark">Faust Studio</p>
+        {/* Not a link: this is the home page, and an off-site first tab stop would pull people away before the CTA.
+            The emblem is decorative (alt=""): the wordmark text next to it names the brand. */}
+        <div className="brand">
+          <img src={emblem1x} srcSet={`${emblem1x} 1x, ${emblem2x} 2x`} width={64} height={64} alt="" />
+          <p className="wordmark">{faust.headerBrandName}</p>
+        </div>
         <LangSwitch />
       </div>
     </header>

@@ -74,7 +74,8 @@ export const en = {
       { label: 'About the studio', href: faust.about },
       { label: 'All references', href: faust.references },
     ],
-    photo: 'Photo: Blue Studio control room',
+    // The art's sign reads "FAUST RECORDS"; the alt says "Faust Studio" until the naming TODO(verify) is settled.
+    artAlt: 'Line drawing of the Faust Studio building, a curved functionalist corner building, seen from the street.',
   },
   next: {
     eyebrow: 'Next step',

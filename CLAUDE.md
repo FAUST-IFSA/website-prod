@@ -50,8 +50,9 @@ src/
   components.tsx        SectionHead, Outbound link, LangSwitch, etc.
   copy/en.ts, cs.ts     ALL visible text. cs must have the same shape as en (enforced by tsc)
   i18n.tsx              language context: useCopy(), useLang()
-  faust.ts              Faust facts/links that don't vary by language + TOOL_URL
+  faust.ts              Faust facts/links + TOOL_URL. brandName = footer wordmark, headerBrandName = header
   index.css             design tokens (CSS custom properties) + all styles
+  assets/               logo art (PNG originals + resized WebP), favicon-32/48.png, apple-touch-icon.png
 docs/
   landing-v1-spec.md    pm spec: requirements, acceptance criteria, out-of-scope list
   design-spec.md        designer spec: tokens, fonts, section layouts, final EN copy, asset list (A1–A7)
@@ -123,11 +124,27 @@ TODO.md                 old team todo list (mostly superseded)
 ## Design
 
 - **Source of truth:** `docs/design-spec.md`. The look follows fauststudio.net: cream `--paper #FFFDF4`, ink
-  `#151515`, rust `--rust #BF3C19`, black "night" bands for the studio section and footer. Fonts are Jost
-  Variable + Barlow Semi Condensed, self-hosted via Fontsource (no Google Fonts requests). The header/footer
-  wordmark uses Russo One (`--font-brand`), a stand-in for fauststudio.net's "P22 Constructivist Square". That
-  font is a demo copy not licensed for commercial use or embedding, so never self-host or trace it. The header
-  matches fauststudio.net's proportions on desktop (89 px tall) and stacks on mobile (design-spec §3.2). Icons: lucide-react.
+  `#151515`, rust `--rust #BF3C19`, black "night" bands for the studio section and footer. Icons: lucide-react.
+- **Fonts** (all self-hosted via Fontsource, no Google Fonts requests):
+  - **Body text: Jost Variable at weight 500**, the user's choice. They asked for Architype Renner Medium, which
+    is commercial (Monotype/MyFonts, and Czech isn't listed). "Renner*", its free version, *is* Jost, so Jost 500
+    is the open equivalent.
+  - Emphasis is 600: h3, stats, FAQ questions, drop message, h1 and buttons.
+  - Body size is 17 px. fauststudio.net uses 20 px (Futura Book, 400). 18 px was suggested for extra sharpness
+    and not applied.
+  - Labels: Barlow Semi Condensed.
+  - Wordmark: Russo One (`--font-brand`), a stand-in for fauststudio.net's "P22 Constructivist Square". That font
+    is a demo copy not licensed for commercial use or embedding, so never self-host or trace it.
+- **Header (design-spec §3.2):** matched to fauststudio.net by measurement. No rust bar (the user removed it).
+  - **Desktop (≥640 px):** 89 px tall (88 px row + 1 px border). The 56 px emblem sits at x 70 / y 8 from the
+    header's top-left, then a 25 px gap. The "FAUST RECORDS" baseline is at y 56, in `--ink-2`. The lockup sits
+    10 px left of the page container edge, which is intentional. Not sticky.
+  - **Below 640 px:** a stacked, centred lockup, 129 px tall, with the language switch pinned top-right.
+- **Favicon:** `index.html` links `src/assets/favicon-32.png`, `favicon-48.png` and `apple-touch-icon.png`, so
+  Vite base-paths them. They're cropped from `faust-light.png` (black on transparent). The apple-touch icon is
+  opaque on `--paper`, because iOS paints transparency black. `/tool/` keeps the autotuner's own favicon. Known
+  gap: the icon is nearly invisible on dark browser tab strips. A `prefers-color-scheme: dark` variant using
+  `faust-dark` was offered but not built.
 - **Tokens:** use the CSS custom properties in `src/index.css`, not raw values. Light theme only. All text pairs
   pass WCAG AA. Keep them that way.
 - **Accessibility:**
@@ -162,6 +179,8 @@ TODO.md                 old team todo list (mostly superseded)
   "Faust Studio" until this is settled. Also the session/course prices
   (~1,000 / 700 CZK/h) and the number of studios (2 or 3?).
 - **The word "autotune"** in copy (a trademark vs search-traffic tradeoff). Put it to the client.
+- **Faust's own font licence:** fauststudio.net's wordmark font is an unlicensed P22 demo file. Raise it with
+  Faust tactfully. A bought P22 licence, or an official wordmark image, would let us match it exactly.
 - **Assets:** from design-spec §6, still missing: photos A3–A5, the before/after vocal with singer consent (A6),
   and the OG image (A7). The A1 logo is in `src/assets/` as the Faust building line art (`faust-light.png` for
   paper, `faust-dark.png` for night bands, with resized WebP copies), used in the header, the footer and the

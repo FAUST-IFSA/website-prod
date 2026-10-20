@@ -92,12 +92,18 @@ themes; that's fine.
 |---|---|---|---|---|---|
 | `--text-display` | Jost | `clamp(2.5rem, 1.6rem + 4vw, 4.5rem)` (40→72) | 1.05 | 600 | Hero h1, `letter-spacing: -0.01em` |
 | `--text-h2` | Jost | `clamp(2rem, 1.5rem + 2vw, 3rem)` (32→48) | 1.1 | 600 | Section titles |
-| `--text-h3` | Jost | `1.375rem` (22) | 1.25 | 500 | Step / card titles, FAQ questions |
-| `--text-lead` | Jost | `clamp(1.125rem, 1rem + 0.5vw, 1.375rem)` (18→22) | 1.5 | 400 | Intro line under h1/h2 |
-| `--text-body` | Jost | `1.0625rem` (17) | 1.6 | 400 | Paragraphs, FAQ answers |
-| `--text-small` | Jost | `0.9375rem` (15) | 1.5 | 400 | Meta, captions, footer |
+| `--text-h3` | Jost | `1.375rem` (22) | 1.25 | 600 | Step / card titles, FAQ questions |
+| `--text-lead` | Jost | `clamp(1.125rem, 1rem + 0.5vw, 1.375rem)` (18→22) | 1.5 | 500 | Intro line under h1/h2 |
+| `--text-body` | Jost | `1.0625rem` (17) | 1.6 | 500 | Paragraphs, FAQ answers |
+| `--text-small` | Jost | `0.9375rem` (15) | 1.5 | 500 | Meta, captions, footer |
 | `--text-label` | Barlow Semi Condensed | `0.8125rem` (13) | 1.2 | 600 | UPPERCASE, `letter-spacing: 0.08em`: eyebrows, step numbers, player labels |
-| `--text-stat` | Jost | `clamp(2rem, 1.6rem + 1.5vw, 2.75rem)` | 1 | 500 | Studio facts numbers, `font-variant-numeric: tabular-nums` |
+| `--text-stat` | Jost | `clamp(2rem, 1.6rem + 1.5vw, 2.75rem)` | 1 | 600 | Studio facts numbers, `font-variant-numeric: tabular-nums` |
+
+Weights (2026-10-20, for a sharper body text): all running text (body, lead, small, FAQ answers, footer) is
+**500**. Anything that was 500 to stand out from the body moves to **600**: h3, stats, FAQ questions and the
+hero drop message. h1/h2 and buttons stay 600; size carries their hierarchy. Barlow labels stay 600, and the
+Russo One wordmark stays 400. Sizes are unchanged. Don't use Jost `ss01` (it isn't in the Fontsource
+subsets). Weight doesn't change WCAG contrast, so the §1.1 ratios still hold.
 
 Paragraphs have `max-width: 65ch`. Use sentence case everywhere except `--text-label`. Times in the player
 use `tabular-nums`.
@@ -130,7 +136,7 @@ use `tabular-nums`.
 
 | Font | Role | Why | Load |
 |---|---|---|---|
-| **Jost** (OFL) | Headings, body, buttons | Open-source Futura revival. Faust sets nearly all its text in Futura. | `@fontsource-variable/jost` (wght 400–600) |
+| **Jost** (OFL) | Headings, body, buttons | Open-source Futura revival, originally released as "Renner*". Faust sets nearly all its text in Futura. **Body text uses 500 (Jost "Medium")**, the open equivalent of Architype Renner Medium, which the user asked for. Renner itself is commercial (Monotype), and its language list doesn't include Czech. | `@fontsource-variable/jost` (variable wght axis; uses 500 and 600) |
 | **Barlow Semi Condensed** (OFL) | `--text-label` only | DIN-like. Faust uses DIN Next for its technical lists. | `@fontsource/barlow-semi-condensed/600.css` |
 
 - **Self-host via Fontsource. Do not link fonts.googleapis.com.** Faust is in the EU, and German courts have

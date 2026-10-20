@@ -78,7 +78,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font: 400 var(--text-body) / 1.6 var(--font-sans);
+  font: 500 var(--text-body) / 1.6 var(--font-sans);
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
 }
@@ -115,7 +115,7 @@ h2 {
 h3 {
   font-size: var(--text-h3);
   line-height: 1.25;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 :focus-visible {
@@ -442,7 +442,7 @@ a.btn-primary:active {
 }
 .drop-message {
   margin-inline: auto;
-  font-weight: 500;
+  font-weight: 600;
 }
 .drop-message:not(:empty) {
   margin-top: var(--space-4);
@@ -681,7 +681,7 @@ a.btn-primary:active {
   white-space: nowrap;
   font-size: var(--text-stat);
   line-height: 1;
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .stat-label {
@@ -808,7 +808,7 @@ a.btn-primary:active {
   padding: 20px 0;
   font-size: var(--text-h3);
   line-height: 1.25;
-  font-weight: 500;
+  font-weight: 600;
   list-style: none;
   cursor: pointer;
 }

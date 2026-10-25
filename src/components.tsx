@@ -47,12 +47,3 @@ export function LangSwitch() {
     </div>
   )
 }
-
-/** Stand-in for a photo the client hasn't supplied yet (design-spec §6). Decorative. */
-export function PhotoPlaceholder({ label, className = '' }: { label: string; className?: string }) {
-  return (
-    <div className={`photo-placeholder ${className}`} aria-hidden="true">
-      <span>{label}</span>
-    </div>
-  )
-}

@@ -105,7 +105,6 @@ export const cs: Copy = bindOneLetterWords({
         meta: 'Od 1 000 Kč (45 €) za hodinu, se zvukařem',
         link: 'Prohlédnout Blue Studio',
         href: faust.blueStudio,
-        photo: 'Foto: Blue Studio',
       },
       {
         title: 'Green Studio',
@@ -114,7 +113,6 @@ export const cs: Copy = bindOneLetterWords({
         meta: 'Od 700 Kč (30 €) za hodinu, se zvukařem',
         link: 'Prohlédnout Green Studio',
         href: faust.greenStudio,
-        photo: 'Foto: Green Studio',
       },
       {
         title: 'Kurzy',
@@ -122,7 +120,6 @@ export const cs: Copy = bindOneLetterWords({
         meta: 'Skupinově nebo individuálně',
         link: 'Zobrazit kurzy',
         href: faust.courses,
-        photo: 'Foto: probíhající kurz',
       },
     ],
     book: 'Rezervovat studio',

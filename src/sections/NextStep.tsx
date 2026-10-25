@@ -1,6 +1,12 @@
-import { Outbound, PhotoPlaceholder, SectionHead } from '../components'
+import blueStudio from '../assets/BS.avif'
+import courses from '../assets/CS.avif'
+import greenStudio from '../assets/GS.avif'
+import { Outbound, SectionHead } from '../components'
 import { faust } from '../faust'
 import { useCopy } from '../i18n'
+
+// Card photos, in the same order as next.cards in the copy files.
+const photos = [blueStudio, greenStudio, courses]
 
 export function NextStep() {
   const { next } = useCopy()
@@ -9,10 +15,10 @@ export function NextStep() {
       <div className="container">
         <SectionHead id="next-heading" eyebrow={next.eyebrow} title={next.heading} lead={next.lead} />
         <ul className="cards" role="list">
-          {next.cards.map((card) => (
+          {next.cards.map((card, i) => (
             <li className="card" key={card.title}>
-              {/* TODO(asset A3, A4, A5): card photos in this order, ≥1200×900, decorative (alt ""). */}
-              <PhotoPlaceholder label={card.photo} className="card-photo" />
+              {/* Decorative (alt ""): the card title names it. */}
+              <img className="card-photo" src={photos[i]} alt="" loading="lazy" />
               <div className="card-body">
                 <h3>{card.title}</h3>
                 <p>{card.body}</p>

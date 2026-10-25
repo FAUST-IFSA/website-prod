@@ -89,7 +89,6 @@ export const en = {
         meta: 'From 1,000 CZK (€45) per hour, with engineer',
         link: 'See the Blue Studio',
         href: faust.blueStudio,
-        photo: 'Photo: Blue Studio',
       },
       {
         title: 'Green Studio',
@@ -98,7 +97,6 @@ export const en = {
         meta: 'From 700 CZK (€30) per hour, with engineer',
         link: 'See the Green Studio',
         href: faust.greenStudio,
-        photo: 'Photo: Green Studio',
       },
       {
         title: 'Courses',
@@ -106,7 +104,6 @@ export const en = {
         meta: 'Groups or one-to-one',
         link: 'See courses',
         href: faust.courses,
-        photo: 'Photo: Course in progress',
       },
     ],
     book: 'Book a session',

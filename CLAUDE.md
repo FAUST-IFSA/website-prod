@@ -118,7 +118,7 @@ TODO.md                 old team todo list (mostly superseded)
 - **Studio facts:** take them only from fauststudio.net (founded 1991 by Richard Mader, per `/kopie-about`).
   Mark anything unconfirmed `TODO(verify)`. The copyright is "© 2026 Faust Studio" (decided by the user).
 - **TODO tags in source:** `TODO(verify)` facts/prices/naming, `TODO(email)`, `TODO(name)`, `TODO(audio)`
-  before/after samples, `TODO(asset A3–A5)` photos, `TODO(cs-review)`. Grep for them before any client
+  before/after samples, `TODO(cs-review)`. Grep for them before any client
   handover.
 
 ## Design
@@ -181,8 +181,9 @@ TODO.md                 old team todo list (mostly superseded)
 - **The word "autotune"** in copy (a trademark vs search-traffic tradeoff). Put it to the client.
 - **Faust's own font licence:** fauststudio.net's wordmark font is an unlicensed P22 demo file. Raise it with
   Faust tactfully. A bought P22 licence, or an official wordmark image, would let us match it exactly.
-- **Assets:** from design-spec §6, still missing: photos A3–A5, the before/after vocal with singer consent (A6),
-  and the OG image (A7). The A1 logo is in `src/assets/` as the Faust building line art (`faust-light.png` for
+- **Assets:** from design-spec §6, still missing: the before/after vocal with singer consent (A6) and the OG
+  image (A7). Photos A3–A5 are in as `src/assets/BS.avif`, `GS.avif` and `CS.avif` (400–570 px wide, below the
+  ≥1200 px spec, so soft on retina). The A1 logo is in `src/assets/` as the Faust building line art (`faust-light.png` for
   paper, `faust-dark.png` for night bands, with resized WebP copies), used in the header, the footer and the
   studio band. It replaces the A2 photo. A ≥1024 px or SVG version of the art would make it sharp on retina.
 - **Visual jump:** the tool's dark system-ui look clashes with the landing page. That's for the tool team.

@@ -628,18 +628,6 @@ a.btn-primary:active {
     gap: var(--space-8);
   }
 }
-.photo-placeholder {
-  display: grid;
-  place-items: center;
-  padding: var(--space-4);
-  border: 1px dashed var(--line-strong);
-  background: var(--paper-2);
-  color: var(--ink-3);
-  text-align: center;
-  font: 600 var(--text-label) / 1.2 var(--font-label);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 /* The building art is bottom-anchored: a negative margin equal to the section's bottom padding puts its
    cut-off base exactly on the band's bottom edge (design-spec §4.4). */
 .studio-art {
@@ -757,9 +745,11 @@ a.btn-primary:active {
   inset: 0;
 }
 .card-photo {
+  display: block;
+  width: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
-  border: 0;
-  border-bottom: 1px dashed var(--line-strong);
+  object-fit: cover;
   transition: transform 300ms ease;
 }
 .card:hover .card-photo {

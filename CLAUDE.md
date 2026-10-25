@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20.
+Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-10-25.
 
 ## What this is
 
@@ -45,19 +45,21 @@ index.html              landing entry; meta description, title, robots meta
 vite.config.ts          reads base from site.config.json
 scripts/build-tool.mjs  fetches + builds the pinned autotuner into dist/tool/
 src/
-  App.tsx               section order: Header, Hero, HowItWorks, BeforeAfter, Studio, NextStep, Faq, Footer
+  App.tsx               section order: Header, Hero, HowItWorks, Studio, NextStep, Faq, Footer
   sections/*.tsx        one file per page section
   components.tsx        SectionHead, Outbound link, LangSwitch, etc.
   copy/en.ts, cs.ts     ALL visible text. cs must have the same shape as en (enforced by tsc)
   i18n.tsx              language context: useCopy(), useLang()
   faust.ts              Faust facts/links + TOOL_URL. brandName = footer wordmark, headerBrandName = header
   index.css             design tokens (CSS custom properties) + all styles
-  assets/               logo art (PNG originals + resized WebP), favicon-32/48.png, apple-touch-icon.png
+  assets/               logo art (PNG originals + resized WebP), favicon-32/48.png, apple-touch-icon.png,
+                        howto.png (tool screenshot original) + cropped howto-1120/2240.webp
 docs/
   landing-v1-spec.md    pm spec: requirements, acceptance criteria, out-of-scope list
-  design-spec.md        designer spec: tokens, fonts, section layouts, final EN copy, asset list (A1–A7)
+  design-spec.md        designer spec: tokens, fonts, section layouts, final EN copy, asset list (A1–A8)
 .github/workflows/deploy.yml   GitHub Pages deploy on push to main
 Team-Docs/              proposal, market research, project description, team diagnostic (not site code)
+reports/                research write-ups (Wix integration options, tool theme-colour findings)
 webdesign.md            early design ideas/inspiration (superseded where design-spec.md disagrees)
 TODO.md                 old team todo list (mostly superseded)
 ```
@@ -74,7 +76,8 @@ TODO.md                 old team todo list (mostly superseded)
   tool's `public/`), then `vite build --base=<base>tool/ --outDir dist/tool`. The install is cached per commit
   via a stamp file, so rebuilds take ~1 s.
 - **To ship a new tool version:** change only `autotuner.commit`, then build and preview. Check that the tool
-  still analyses an upload with no 404s.
+  still analyses an upload with no 404s. If the tool's look changed, retake the How it works screenshot
+  (`src/assets/howto.png`, design-spec A8), which shows the UI at `e255279`.
 - **Why sub-path hosting works:** the tool loads its model/WASM from `import.meta.env.BASE_URL` and its workers
   via `new URL(..., import.meta.url)`. If the tool team ever hard-codes `/models/...`-style absolute paths, it
   breaks under `/website-prod/tool/`. Re-check this when bumping the pin.
@@ -117,8 +120,7 @@ TODO.md                 old team todo list (mostly superseded)
   "autotune" appears only in the meta description, pending a decision (`TODO(name)`).
 - **Studio facts:** take them only from fauststudio.net (founded 1991 by Richard Mader, per `/kopie-about`).
   Mark anything unconfirmed `TODO(verify)`. The copyright is "© 2026 Faust Studio" (decided by the user).
-- **TODO tags in source:** `TODO(verify)` facts/prices/naming, `TODO(email)`, `TODO(name)`, `TODO(audio)`
-  before/after samples, `TODO(cs-review)`. Grep for them before any client
+- **TODO tags in source:** `TODO(verify)` facts/prices/naming, `TODO(email)`, `TODO(name)`, `TODO(cs-review)`. Grep for them before any client
   handover.
 
 ## Design
@@ -157,6 +159,8 @@ TODO.md                 old team todo list (mostly superseded)
   - the header wordmark is not a link (it would leak visitors off the funnel); fauststudio.net is linked in the
     footer
   - the hero CTA is a link, not a real drop zone
+  - in the How it works tool banner (design-spec §4.2), only the centred "Open the tuner" button is a link, not
+    the image (one link, one tab stop)
 
 ## Team workflow
 
@@ -181,16 +185,22 @@ TODO.md                 old team todo list (mostly superseded)
 - **The word "autotune"** in copy (a trademark vs search-traffic tradeoff). Put it to the client.
 - **Faust's own font licence:** fauststudio.net's wordmark font is an unlicensed P22 demo file. Raise it with
   Faust tactfully. A bought P22 licence, or an official wordmark image, would let us match it exactly.
-- **Assets:** from design-spec §6, still missing: the before/after vocal with singer consent (A6) and the OG
-  image (A7). Photos A3–A5 are in as `src/assets/BS.avif`, `GS.avif` and `CS.avif` (400–570 px wide, below the
+- **Assets:** from design-spec §6, still missing: the OG image (A7). (A6, the before/after vocal, is no longer
+  needed since that section was removed.) Photos A3–A5 are in as `src/assets/BS.avif`, `GS.avif` and `CS.avif` (400–570 px wide, below the
   ≥1200 px spec, so soft on retina). The A1 logo is in `src/assets/` as the Faust building line art (`faust-light.png` for
   paper, `faust-dark.png` for night bands, with resized WebP copies), used in the header, the footer and the
   studio band. It replaces the A2 photo. A ≥1024 px or SVG version of the art would make it sharp on retina.
 - **Visual jump:** the tool's dark system-ui look clashes with the landing page. That's for the tool team.
+- **Tool theme colour:** investigated 2026-10-25, see `reports/autotuner-theme-colour.md`. Recolouring the
+  tool's green is possible without changing libraries (8 lines of the tool's own code), but the canvas green is
+  also the "in tune" signal, and blue is off-brand too. The recommended route is asking the tool team (with
+  colour tokens). Waiting on the user: whether to send that request, and whether to use a buttons-only CSS
+  override from `build-tool.mjs` as a demo stopgap.
 - **v2 ideas parked:**
   - a real upload box in the hero that hands the file to the tool (possible via shared-origin IndexedDB, but it
     needs tool-team changes)
   - a full-window drop guard
   - dark theme
-  - a working before/after player once real audio exists
+  - a before/after audio section (removed from v1 by the user, 2026-10-25; the old design is kept in
+    design-spec §4.3)
 - **The "autotuner" pin:** see the unmerged-branch risk above.

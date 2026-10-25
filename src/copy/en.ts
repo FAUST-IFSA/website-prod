@@ -45,17 +45,6 @@ export const en = {
     button: 'Open the tuner',
     imageAlt: "The tuner's pitch editor: every sung note laid out against a piano keyboard.",
   },
-  beforeAfter: {
-    eyebrow: 'Listen',
-    heading: 'Hear the difference',
-    lead: 'The same take, straight from the mic and after a few minutes in the tuner.',
-    tag: 'Samples coming soon',
-    tracks: [
-      { label: 'Before', title: 'Raw take', play: 'Play before sample' },
-      { label: 'After', title: 'Tuned in the tuner', play: 'Play after sample' },
-    ],
-    link: 'Try it with your own vocal',
-  },
   studio: {
     eyebrow: 'The studio behind the tool',
     heading: 'Made at Faust Studio, Prague',

@@ -31,17 +31,17 @@ export function HowItWorks() {
           })}
         </ol>
         {/* Screenshot banner with the CTA centred on it. Only the button is a link (one tab stop). */}
-        <div className="how-banner night">
+        <div className="how-banner">
           <img
             src={shot1x}
             srcSet={`${shot1x} 1120w, ${shot2x} 2240w`}
             sizes="(min-width: 1184px) 1120px, 100vw"
             width={1120}
-            height={261}
+            height={227}
             alt={how.imageAlt}
             loading="lazy"
           />
-          <a className="btn btn-primary how-cta" href={TOOL_URL}>
+          <a className="btn btn-paper" href={TOOL_URL}>
             {how.button}
           </a>
         </div>

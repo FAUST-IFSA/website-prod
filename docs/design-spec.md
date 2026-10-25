@@ -160,6 +160,7 @@ label.
 |---|---|
 | Primary | `--rust` bg, `--paper` text, Jost 600 17 px, height 52 px, padding 0 28 px, `--radius-sm`. Hover/active: `--rust-press`. Active: `translateY(1px)`. |
 | Secondary | Transparent, 2 px `--ink` border, `--ink` text, same size. Hover: `--ink` bg, `--paper` text. On night: `--paper` border/text. |
+| Paper (on images) | For a button over a dark image (§4.2 banner). `--paper` bg, `--ink` text, same size. Hover: `--rust` bg, `--paper` text. Active: `--rust-press` and `translateY(1px)` (no transform under reduced motion). Focus: the standard 3 px ring in `--paper`; the 3 px offset shows the dark image between the ring and the button. |
 | Text link | Inherits text color. `text-decoration: underline 1px var(--rust)` (on night: `--ember`), `text-underline-offset: 3px`. Hover: thickness 2px. |
 | Outbound link | Text link + Lucide `ArrowUpRight` 16 px. Opens in the **same tab**. |
 
@@ -241,6 +242,9 @@ line art, matched to their scale approximately, as the user asked.
 
 Every section is a `<section aria-labelledby="…">` with one h2. The only h1 is in the hero.
 
+Page order (2026-10-25): Header → Hero (paper) → How it works (paper, ending in the dark tool banner) →
+The studio (night) → Next step (paper) → FAQ (paper-2) → Footer (night). Before/after (§4.3) was removed.
+
 ### 4.1 Hero
 
 **Layout, desktop (≥1024):** `--paper` background, centered column, max-width 880. Padding is 96 top and 96
@@ -302,9 +306,51 @@ Use an `<ol>` so screen readers announce the order. The visual numbers are `aria
 Icons: `Upload`, `AudioLines`, `WandSparkles`, `Download`. Step 03 is the fastest "wow", so it leads with
 Tune Up. Drag-to-fix is the second half of the same step.
 
-Under the grid there's a secondary button, "Open the tuner" → `tool/`, left-aligned with 48 px above it.
+**Tool banner (2026-10-25):** 48 px under the grid, a screenshot of the tuner's pitch editor (A8) with the
+"Open the tuner" button (→ `tool/`) centred on it. It's the last thing in the section, so the section's own
+bottom padding (96, or 64 below 1024) is the cream gap before the night Studio band. That join needs nothing
+extra: 48 px above the banner vs 96/64 below groups it with the steps, and a contained, rounded image above
+a full-bleed band reads as two different things (checked at 1440 and 375, 2026-10-25).
 
-### 4.3 Before / after
+```
+ ┌──────────────────────────────────────────────────────────────┐  container width, --radius-md,
+ │ C6 ▒ ░░     ░      ░░     ░            ░                     │  --night behind the image,
+ │ B5 ▒   ░░       ┌──────────────────┐        ░░    ░          │  image dimmed to 60%
+ │ A5 ▒ ░    ░     │  Open the tuner  │   ░          ░░         │  ← .btn .btn-paper, centred
+ │ G5 ▒   ░░       └──────────────────┘      ░            ░     │
+ │ D5 ▒  ░      ░░          ░                  ░                │
+ └──────────────────────────────────────────────────────────────┘
+```
+
+- **Asset:** `howto.png` cropped to rows 0–596 (2956 × 597). This removes the tool's status bar ("41 of 73
+  notes changed" and the blue "Export ▾" button), which would read as a second, fake button. Export it as
+  WebP at 1120 and 2240 px wide (`srcset`; cwebp rounds them to 1120 × 227 and 2240 × 453), with the
+  `<img>` `width`/`height` matching the real files, lazy loaded.
+- **Box:** `position: relative`, flex, centred both ways; `width: 100%`, `aspect-ratio: 2956 / 597`,
+  `min-height: 200px` (without the explicit width, aspect-ratio turns the min-height into a ~990 px min-width
+  and the page scrolls sideways at 375),
+  padding 16, `--radius-md`, `--night` background. No border: the dark image against `--paper` defines its own
+  edge. No `overflow: hidden` (it would turn off the aspect-ratio box's content-size minimum).
+- **Image:** `position: absolute; inset: 0`, `width/height: 100%`, `object-fit: cover`,
+  `object-position: left`, `border-radius: inherit`, `filter: brightness(0.6)`. At ≥ ~1050 px viewports the
+  box matches the image ratio, so nothing is cropped. Below that, `min-height` wins and the image is cropped
+  from the right, so it always starts at the piano keys and the first seconds of notes. The image stays at
+  roughly the same scale at every width (about 0.33–0.38).
+- **Button:** `.btn .btn-paper` (§3.1), `position: relative` so it paints above the image. Only the button is
+  a link. The image is not clickable, so there's one link and one tab stop. Inside the banner,
+  `--focus: var(--paper)`.
+- **Text zoom / long labels:** inside the banner the button may wrap rather than overflow:
+  `white-space: normal; text-align: center; line-height: 1.2; padding-block: var(--space-2)`. At the default
+  size it never wraps and looks identical to §3.1 (the 52 px min-height dominates).
+- **Mobile (375):** 343 × 200 box. The image keeps its left edge (piano keys) and is cropped on the right. The button keeps its natural width (it doesn't
+  stretch like the hero button), with about 74 px of screenshot above and below it.
+- **Alt text:** in `copy/en.ts` and `cs.ts` (`TODO(cs-review)`). Describe the editor (notes shown on a
+  piano-roll grid), not "screenshot of", and don't say "Auto-Tune".
+
+### 4.3 Before / after (removed)
+
+> **Removed from v1 by the user, 2026-10-25; parked as a v2 idea** (a working player once real, consented
+> audio exists, asset A6). The design below is kept so it can be restored. Nothing in it applies to v1.
 
 **Layout:** `--paper-2` section background. The eyebrow, h2 and lead are left-aligned. Then one player card,
 max-width 760: `--paper` background, 2 px `--ink` top rule, 1px `--line-strong` on the other three sides,
@@ -445,7 +491,7 @@ word appears only in the meta description, for search.
 - 04 · **Download**: Export a full-quality 24-bit WAV, or a smaller 192 kbps MP3.
 - Button: Open the tuner
 
-**Before / after**
+**Before / after** (removed 2026-10-25, see §4.3; kept for v2, not in v1 copy)
 - Eyebrow: Listen
 - H2: Hear the difference
 - Lead: The same take, straight from the mic and after a few minutes in the tuner.
@@ -547,7 +593,8 @@ Faust Studio (or approve it) with permission to use it.
 | A3 | Blue Studio photo (different angle or the live room) | Next step card 1 | ≥1200 × 900 | "" (decorative; the card title names it) |
 | A4 | Green Studio photo | Next step card 2 | ≥1200 × 900 | "" |
 | A5 | Course or session in progress (people, synth lab) | Next step card 3 | ≥1200 × 900 | "" |
-| A6 | Before/after audio: the same vocal take, raw and tuned | Before/after | 15–30 s each, MP3 192 kbps, loudness-matched, signed singer consent | n/a (labelled by row) |
+| A6 (parked, v2) | Before/after audio: the same vocal take, raw and tuned. Not needed for v1: §4.3 was removed 2026-10-25 | Before/after (v2) | 15–30 s each, MP3 192 kbps, loudness-matched, signed singer consent | n/a (labelled by row) |
+| A8 ✅ | Tool screenshot: `src/assets/howto.png`, 2956 × 688 | How it works banner (§4.2) | Crop to rows 0–596 (drops the status bar), WebP 1120 + 2240 w | Programmer's, in `copy/*.ts` |
 | A7 | Social share image (optional) | `og:image` | 1200 × 630, A2 cropped with the emblem, or the A1 illustration on `--paper` with the wordmark | n/a |
 
 Export photos as AVIF/WebP with a JPEG fallback and set `width`/`height`. Images below the hero are lazy
@@ -563,7 +610,7 @@ loaded. Photos are not filtered or tinted. The warmth comes from the photography
   pipeline). Use WebP lossless with alpha: header `light` at 44 and 88 px (1x/2x), footer `dark` at 96 and
   192 px, studio `dark` at 360 and the original 512 px (`srcset` 1x/2x). Set `width`/`height` on every `<img>`.
   The header emblem is eager-loaded; the footer and studio art use `loading="lazy"`.
-- Audio: the disabled player state in §4.3.
+- Audio: none in v1. (Was the disabled player state in §4.3, removed 2026-10-25.)
 
 ---
 
@@ -574,7 +621,8 @@ loaded. Photos are not filtered or tinted. The warmth comes from the photography
       landmarks are present.
 - [ ] The hero CTA is the first tab stop after the skip link and language switch. Enter opens `tool/`.
 - [ ] Focus is visible on every interactive element, on both paper and night.
-- [ ] Play buttons have changing `aria-label`s and are `disabled` while there are no samples.
+- [ ] ~~Play buttons have changing `aria-label`s and are `disabled` while there are no samples.~~ n/a in v1
+      (Before/after removed 2026-10-25).
 - [ ] FAQ uses `<details>/<summary>`.
 - [ ] Outbound links make sense out of context (no "click here").
 - [ ] `<html lang>` follows the language switch.

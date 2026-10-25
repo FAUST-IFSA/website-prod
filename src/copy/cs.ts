@@ -61,18 +61,6 @@ export const cs: Copy = bindOneLetterWords({
     // TODO(cs-review)
     imageAlt: 'Editor ladění v nástroji: každá zazpívaná nota rozložená podle klaviatury.',
   },
-  beforeAfter: {
-    eyebrow: 'Poslechněte si',
-    heading: 'Slyšte ten rozdíl',
-    lead: 'Stejný záznam rovnou z mikrofonu a po pár minutách ladění.',
-    tag: 'Ukázky brzy',
-    // TODO(cs-review): the row labels render uppercase; a screen reader may spell the 2-letter "PO" out letter by letter.
-    tracks: [
-      { label: 'Před', title: 'Surový záznam', play: 'Přehrát ukázku před' },
-      { label: 'Po', title: 'Po naladění', play: 'Přehrát ukázku po' },
-    ],
-    link: 'Vyzkoušejte to s vlastním zpěvem',
-  },
   studio: {
     eyebrow: 'Studio za nástrojem',
     heading: 'Vzniklo ve Faust Studiu v Praze',

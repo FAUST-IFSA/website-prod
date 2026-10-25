@@ -235,6 +235,19 @@ a.btn-primary:active {
   background: var(--ink);
   color: var(--paper);
 }
+/* On dark images: paper → rust on hover is a clear change, where rust → rust-press would barely show. */
+.btn-paper {
+  background: var(--paper);
+  color: var(--ink);
+}
+.btn-paper:hover {
+  background: var(--rust);
+  color: var(--paper);
+}
+a.btn-paper:active {
+  background: var(--rust-press);
+  transform: translateY(1px);
+}
 
 /* ---------- §3.2 Header (sized to the fauststudio.net banner; not sticky) ---------- */
 
@@ -523,107 +536,38 @@ a.btn-primary:active {
   margin-top: var(--space-2);
   color: var(--ink-2);
 }
-/* Screenshot banner: the image and the button share one grid cell, so the button sits centred on the image. */
+/* Tool screenshot (A8) with the CTA centred on it. Below ~1050 px min-height wins and the image crops from the
+   right, so the piano keys stay in view. No overflow: hidden (it would turn off aspect-ratio's content minimum). */
 .how-banner {
-  display: grid;
+  --focus: var(--paper);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* without it, aspect-ratio turns min-height into a ~990 px min-width */
+  aspect-ratio: 2956 / 597;
+  min-height: 200px;
   margin-top: var(--space-7);
-}
-.how-banner > * {
-  grid-area: 1 / 1;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--night);
 }
 .how-banner img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: left;
+  border-radius: inherit;
+  filter: brightness(0.6);
 }
-.how-cta {
-  place-self: center;
-}
-
-/* ---------- §4.3 Before / after ---------- */
-
-.player {
-  max-width: 760px;
-  padding: var(--space-5);
-  border: 1px solid var(--line-strong);
-  border-top: var(--rule);
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  background: var(--paper);
-}
-.player-tag {
-  width: fit-content;
-  margin: 0 0 var(--space-2) auto;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--line-strong);
-  color: var(--ink-2);
-}
-.track {
-  display: grid;
-  grid-template-columns: 64px 48px minmax(0, 11rem) 1fr auto;
-  grid-template-areas: 'label play title wave time';
-  align-items: center;
-  gap: var(--space-4);
-  padding-block: var(--space-4);
-}
-.track + .track {
-  border-top: 1px solid var(--line);
-}
-.track-label {
-  grid-area: label;
-  color: var(--ink-2);
-}
-.track-title {
-  grid-area: title;
-}
-.track-time {
-  grid-area: time;
-  font-size: var(--text-small);
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-}
-.play {
-  grid-area: play;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: var(--radius-full);
-  background: var(--ink);
-  color: var(--paper);
-}
-.play:disabled {
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--ink-3);
-  cursor: not-allowed;
-}
-.waveform {
-  grid-area: wave;
-  width: 100%;
-  height: 32px;
-  stroke: var(--line);
-  stroke-width: 1;
-}
-.player-link {
-  display: inline-block;
-  margin-top: var(--space-5);
-}
-@media (max-width: 639px) {
-  .player {
-    padding: var(--space-4);
-  }
-  .track {
-    grid-template-columns: 64px 48px 1fr;
-    grid-template-areas:
-      'label play title'
-      'wave wave wave'
-      'time time time';
-    row-gap: var(--space-2);
-  }
-  .track-time {
-    justify-self: end;
-  }
+.how-banner .btn {
+  position: relative; /* paints above the absolutely positioned img */
+  white-space: normal; /* wraps only at large text sizes or for long labels */
+  text-align: center;
+  line-height: 1.2;
+  padding-block: var(--space-2);
 }
 
 /* ---------- §4.4 The studio ---------- */
@@ -879,6 +823,7 @@ details[open] .faq-icon {
 
 @media (prefers-reduced-motion: reduce) {
   a.btn-primary:active,
+  a.btn-paper:active,
   .cta-box:active .btn-primary,
   .card:hover .card-photo,
   details[open] .faq-icon {

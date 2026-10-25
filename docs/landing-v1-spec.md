@@ -32,16 +32,18 @@ Faust Studio as the next step.
    Visually it can read as the remove.bg-style "one big box", but it is a link. A real drop zone that hands
    the file to the tool is out of scope (it needs tool-team changes).
 2. **How it works:** 3–4 steps: upload, see your notes, drag to fix, export WAV/MP3. Must match what the
-   tool actually does today.
-3. **Before / after:** a two-track player layout. We have no real samples yet: use clearly marked
-   placeholder audio slots and list them as a TODO.
-4. **The studio:** Faust Studio, Prague, recording since 1991. Take facts only from fauststudio.net. Anything
+   tool actually does today. Under the steps: a banner screenshot of the tool's pitch editor with the
+   "Open the tuner" button centred on it (one link, one tab stop). Added 2026-10-25.
+3. **The studio:** Faust Studio, Prague, recording since 1991. Take facts only from fauststudio.net. Anything
    unverified gets a visible `TODO(verify)` comment in the source, not invented copy.
-5. **Next step:** book a session / take a course, modeled on Abbey Road's rooms and services. Links go to the
+4. **Next step:** book a session / take a course, modeled on Abbey Road's rooms and services. Links go to the
    relevant fauststudio.net pages.
-6. **FAQ:** including "Is it free?", "Does my audio get uploaded?" (no, it runs in your browser), "Which files
+5. **FAQ:** including "Is it free?", "Does my audio get uploaded?" (no, it runs in your browser), "Which files
    work?" (WAV, MP3, OGG, FLAC, up to 100 MB / 10 min), and "Do I need an account?"
-7. **Footer:** Faust Studio contact link, language switch.
+6. **Footer:** Faust Studio contact link, language switch.
+
+A "Before / after" two-track player section was in v1 with placeholder audio. The user removed it on
+2026-10-25 as unnecessary for the page.
 
 ## Honesty rules for copy
 
@@ -73,7 +75,7 @@ has none.
 
 ## Out of scope for v1
 
-A working upload box in the hero, email collection/storage, real before/after audio, analytics, custom domain,
+A working upload box in the hero, email collection/storage, a before/after audio section, analytics, custom domain,
 Vercel deployment, and any changes to the autotuner repo.
 
 ## Who does what

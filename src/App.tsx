@@ -1,4 +1,3 @@
-import { BeforeAfter } from './sections/BeforeAfter'
 import { Faq } from './sections/Faq'
 import { Footer } from './sections/Footer'
 import { Header } from './sections/Header'
@@ -14,7 +13,6 @@ export default function App() {
       <main id="main">
         <Hero />
         <HowItWorks />
-        <BeforeAfter />
         <Studio />
         <NextStep />
         <Faq />

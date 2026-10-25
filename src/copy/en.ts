@@ -124,7 +124,11 @@ export const en = {
       },
       {
         q: 'Which files work?',
-        a: 'WAV, MP3, OGG and FLAC, up to 100 MB and 10 minutes long. It works best on a solo vocal without music behind it.',
+        a: 'WAV, MP3, OGG and FLAC, up to 100 MB and 10 minutes long.',
+      },
+      {
+        q: 'Can I use a track with music behind the vocal?',
+        a: 'No. Your file must be vocals only, with no music, beat or backing track. A track with any backing in it will not work at all.',
       },
       { q: 'What do I get when I download?', a: 'A full-quality 24-bit WAV, or a smaller 192 kbps MP3.' },
       {

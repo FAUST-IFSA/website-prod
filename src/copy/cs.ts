@@ -140,7 +140,11 @@ export const cs: Copy = bindOneLetterWords({
       },
       {
         q: 'Jaké soubory fungují?',
-        a: 'WAV, MP3, OGG a FLAC, do 100 MB a délky 10 minut. Nejlépe funguje samotný zpěv bez hudby v pozadí.',
+        a: 'WAV, MP3, OGG a FLAC, do 100 MB a délky 10 minut.',
+      },
+      {
+        q: 'Mohu použít nahrávku s hudbou v pozadí?',
+        a: 'Ne. Soubor musí obsahovat jen zpěv, bez hudby, beatu nebo doprovodu. Nahrávka s jakýmkoli doprovodem nebude vůbec fungovat.',
       },
       { q: 'Co dostanu při stažení?', a: 'WAV v plné kvalitě (24 bitů) nebo menší MP3 (192 kb/s).' },
       {

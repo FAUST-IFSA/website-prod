@@ -523,8 +523,21 @@ a.btn-primary:active {
   margin-top: var(--space-2);
   color: var(--ink-2);
 }
-.how-cta {
+/* Screenshot banner: the image and the button share one grid cell, so the button sits centred on the image. */
+.how-banner {
+  display: grid;
   margin-top: var(--space-7);
+}
+.how-banner > * {
+  grid-area: 1 / 1;
+}
+.how-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.how-cta {
+  place-self: center;
 }
 
 /* ---------- §4.3 Before / after ---------- */

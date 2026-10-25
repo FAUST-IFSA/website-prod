@@ -1,4 +1,6 @@
 import { AudioLines, Download, Upload, WandSparkles } from 'lucide-react'
+import shot1x from '../assets/howto-1120.webp'
+import shot2x from '../assets/howto-2240.webp'
 import { SectionHead } from '../components'
 import { TOOL_URL } from '../faust'
 import { useCopy } from '../i18n'
@@ -28,9 +30,21 @@ export function HowItWorks() {
             )
           })}
         </ol>
-        <a className="btn btn-secondary how-cta" href={TOOL_URL}>
-          {how.button}
-        </a>
+        {/* Screenshot banner with the CTA centred on it. Only the button is a link (one tab stop). */}
+        <div className="how-banner night">
+          <img
+            src={shot1x}
+            srcSet={`${shot1x} 1120w, ${shot2x} 2240w`}
+            sizes="(min-width: 1184px) 1120px, 100vw"
+            width={1120}
+            height={261}
+            alt={how.imageAlt}
+            loading="lazy"
+          />
+          <a className="btn btn-primary how-cta" href={TOOL_URL}>
+            {how.button}
+          </a>
+        </div>
       </div>
     </section>
   )

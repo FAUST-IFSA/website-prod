@@ -43,6 +43,7 @@ export const en = {
       { title: 'Download', body: 'Export a full-quality 24-bit WAV, or a smaller 192 kbps MP3.' },
     ],
     button: 'Open the tuner',
+    imageAlt: "The tuner's pitch editor: every sung note laid out against a piano keyboard.",
   },
   beforeAfter: {
     eyebrow: 'Listen',

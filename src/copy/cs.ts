@@ -58,6 +58,8 @@ export const cs: Copy = bindOneLetterWords({
       { title: 'Stáhněte', body: 'Exportujte WAV v plné kvalitě (24 bitů) nebo menší MP3 (192 kb/s).' },
     ],
     button: 'Otevřít nástroj',
+    // TODO(cs-review)
+    imageAlt: 'Editor ladění v nástroji: každá zazpívaná nota rozložená podle klaviatury.',
   },
   beforeAfter: {
     eyebrow: 'Poslechněte si',

@@ -18,8 +18,7 @@ Faust Studio as the next step.
 
 ## Facts the work depends on
 
-- Autotuner repo: `FAUST-IFSA/autotuner`, branch `aidan/pitch-engine`, commit `e255279`. This branch is not
-  merged to `main`. Pin the commit, not `main`.
+- Autotuner repo: `FAUST-IFSA/autotuner`, branch `main`, commit `72b353a`. Pin the commit, not `main`.
 - The tool is already base-path safe. `vite build --base=/website-prod/tool/` builds correctly (tested,
   about 5 MB including the model and WASM files). `npm ci` runs a postinstall script that copies those files
   into `public/`, so the tool must be built with `npm ci`, not with an existing `node_modules`.

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-10-25.
+Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-11-03 (email capture).
 
 ## What this is
 
@@ -40,23 +40,28 @@ violations in EN and CS, and no horizontal scroll at 375 px.
 ## Layout
 
 ```
-site.config.json        THE config: base path + pinned autotuner commit (see below)
+site.config.json        THE config: base path + signup endpoint URL + pinned autotuner commit (see below)
 index.html              landing entry; meta description, title, robots meta
-vite.config.ts          reads base from site.config.json
+vite.config.ts          reads base + signupEndpoint from site.config.json (VITE_SIGNUP_ENDPOINT overrides)
 scripts/build-tool.mjs  fetches + builds the pinned autotuner into dist/tool/
+wix/                    the Velo HTTP function Faust pastes into their Wix site + README + test.sh (see Email capture)
 src/
-  App.tsx               section order: Header, Hero, HowItWorks, Studio, NextStep, Faq, Footer
-  sections/*.tsx        one file per page section
+  App.tsx               section order: Header, Hero, HowItWorks, Studio, NextStep, Faq, Signup, Footer
+  sections/*.tsx        one file per page section (Signup.tsx = email form, design-spec §4.8)
   components.tsx        SectionHead, Outbound link, LangSwitch, etc.
   copy/en.ts, cs.ts     ALL visible text. cs must have the same shape as en (enforced by tsc)
   i18n.tsx              language context: useCopy(), useLang()
-  faust.ts              Faust facts/links + TOOL_URL. brandName = footer wordmark, headerBrandName = header
+  faust.ts              Faust facts/links + TOOL_URL, SIGNUP_ENDPOINT, SIGNUP_CONSENT_VERSION, privacy URL.
+                        brandName = footer wordmark, headerBrandName = header
+  vite-env.d.ts         types for import.meta.env.SIGNUP_ENDPOINT
   index.css             design tokens (CSS custom properties) + all styles
   assets/               logo art (PNG originals + resized WebP), favicon-32/48.png, apple-touch-icon.png,
                         howto.png (tool screenshot original) + cropped howto-1120/2240.webp
 docs/
   landing-v1-spec.md    pm spec: requirements, acceptance criteria, out-of-scope list
   design-spec.md        designer spec: tokens, fonts, section layouts, final EN copy, asset list (A1–A8)
+  email-capture-spec.md       pm spec for the signup form + Velo endpoint: contract, criteria, task status
+  email-capture-migration.md  step-by-step install on Faust's real site, with what failed on the test site
 .github/workflows/deploy.yml   GitHub Pages deploy on push to main
 Team-Docs/              proposal, market research, project description, team diagnostic (not site code)
 reports/                research write-ups (Wix integration options, tool theme-colour findings)
@@ -106,7 +111,47 @@ TODO.md                 old team todo list (mostly superseded)
 - **Later (production):** probably Vercel + a custom domain. Set `base` to `/`, remove the noindex, and the
   same build works. No Next.js: the team chose Vite to match the tool.
 - **GitHub Pages limits:** static files only. No server, no custom headers, no SPA fallback. So: no
-  client-side routes (the language is state, not a URL), and no backend for email collection.
+  client-side routes (the language is state, not a URL), and no backend of ours; email collection POSTs to a
+  Velo function on Faust's Wix site instead (see Email capture).
+
+## Email capture (added 2026-11-03)
+
+Spec: `docs/email-capture-spec.md`. Install guide: `docs/email-capture-migration.md`. Research:
+`reports/Wix Core email capture.md`.
+
+- **How it works:** `src/sections/Signup.tsx` (between FAQ and Footer) POSTs
+  `{email, lang, source:"landing", consent:true, consentVersion, website:""}` to `SIGNUP_ENDPOINT`. The endpoint
+  is a Velo HTTP function (`wix/http-functions.js`, ~75 lines) living in Faust's Wix site; it creates a Wix
+  Contact with label `tuner` and three custom fields (`tuner-consent-at`, `tuner-consent-version`,
+  `tuner-source`). No server of ours, no secret in the page, no cookies, email never stored client-side.
+  Responses: 200 ok (incl. duplicates), 400 bad input/honeypot, 500 Wix refused, 204 preflight.
+- **Config:** `site.config.json` → `signupEndpoint` (production URL `https://www.fauststudio.net/_functions/tunerSignup`).
+  `VITE_SIGNUP_ENDPOINT` (shell or gitignored `.env.local`) overrides it for dev/preview. Read in code as
+  `import.meta.env.SIGNUP_ENDPOINT`, never hard-code the URL. `SIGNUP_CONSENT_VERSION` in `src/faust.ts` is
+  `2026-11-v1`; bump it whenever the consent sentence changes and keep the old text in the repo.
+- **Status:** the function and form are built and tested end to end on our free test site
+  (`contactfaux400500.wixsite.com/my-site-3`). **Not yet installed on fauststudio.net**, so the production URL
+  404s and a deployed form shows its error state on submit until Faust pastes the file (spec task 0/4).
+- **Wix facts learned the hard way** (all handled in the code, don't re-learn them):
+  - The backend file must be named exactly `http-functions.js`; create it via Backend → `+` → Expose site API.
+    Anything else gives `404` + `x-wix-code-user-error-details {"code":"MODULE_NOT_FOUND"}`, identical to a
+    site with no Velo code. `/_functions-dev/` runs the unpublished editor code.
+  - Wix **silently drops** unknown extended fields (contact created, HTTP 200, consent proof lost), and refuses
+    unknown labels. So the function creates the label/fields itself (`findOrCreateLabel` /
+    `findOrCreateExtendedField`, once per cold start). Nothing to create in the dashboard.
+  - API-created label/field keys get a **random suffix** (`custom.tuner-WnXAj`). Never hardcode keys; the
+    function uses the ones Wix returns, matched by display name. Faust must not rename them.
+  - Use `wix-crm-backend` (stable), not `wix-crm.v2` (Developer Preview). `createContact` takes flat
+    `labelKeys[]` and flat `extendedFields{}`; duplicates throw `DUPLICATE_CONTACT_EXISTS` (treated as success).
+  - Wix's Logs panel is live-only; it shows nothing from before you opened it.
+  - Publishing the Velo file publishes Faust's whole site, pending edits included.
+- **Form a11y decisions:** submit uses `aria-disabled` (focusable; an incomplete attempt announces a hint and
+  moves focus), not `disabled`. One `role="status"` announcer. Honeypot `aria-hidden` + `tabindex=-1`.
+  Button says "Subscribe", not "Sign up", so the FAQ's "without signing up" keeps meaning an account. The
+  privacy link renders only once `faust.privacy` has a URL.
+- **Not decided:** the user may later move the form into the tool instead of the landing page. `Signup.tsx`
+  and design-spec §4.8 then serve as the tool team's reference. Same endpoint, `source:"tool"`.
+- **Test:** `wix/test.sh <site root or endpoint URL>` runs the criterion-10 checks with curl.
 
 ## Content and copy rules
 
@@ -115,7 +160,8 @@ TODO.md                 old team todo list (mostly superseded)
 - **Language:** a saved choice (saved only when the user clicks the switch) wins. Otherwise CS if any
   `navigator.languages` entry starts with `cs`, else EN. The switch is in both the header and the footer.
 - **Honesty:** never claim the tool does something it doesn't. True today: free, no account, audio never leaves
-  the device. If the tool team adds an email gate, update every `TODO(email)` string.
+  the device. The landing-page signup is optional and no copy may imply it's required. If the tool team adds an
+  email gate, update every `TODO(email)` string.
 - **Trademark:** "Auto-Tune" is an Antares trademark. Visible copy says "vocal tuner"/"the tuner".
   "autotune" appears only in the meta description, pending a decision (`TODO(name)`).
 - **Studio facts:** take them only from fauststudio.net (founded 1991 by Richard Mader, per `/kopie-about`).
@@ -176,8 +222,10 @@ TODO.md                 old team todo list (mostly superseded)
 
 ## Open decisions / known gaps
 
-- **Email collection:** where signup emails are stored. The tool's email gate is still a client-side stub with
-  no backend, and GitHub Pages can't host one. This blocks the automation deliverable.
+- **Email collection:** solved in principle (see Email capture): emails go to Faust's Wix Contacts. Waiting on
+  Faust: Dev Mode + paste the file (or a collaborator seat), their privacy-policy URL, and their custom domain
+  for the origin allow-list. Contacts arrive "Never subscribed"; flipping them is Faust's dashboard toggle.
+  The tool's own email gate is still a stub; it gets the same endpoint contract once Faust's install is verified.
 - **Naming:** "Faust Studio" vs "Faust Records" (the client site uses both). The user's call so far: only the
   header wordmark reads "FAUST RECORDS", matching fauststudio.net. The footer, copy, title and copyright stay
   "Faust Studio" until this is settled. Also the session/course prices

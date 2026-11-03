@@ -242,8 +242,9 @@ line art, matched to their scale approximately, as the user asked.
 
 Every section is a `<section aria-labelledby="…">` with one h2. The only h1 is in the hero.
 
-Page order (2026-10-25): Header → Hero (paper) → How it works (paper, ending in the dark tool banner) →
-The studio (night) → Next step (paper) → FAQ (paper-2) → Footer (night). Before/after (§4.3) was removed.
+Page order (2026-11-03): Header → Hero (paper) → How it works (paper, ending in the dark tool banner) →
+The studio (night) → Next step (paper) → FAQ (paper-2) → **Email signup (paper, §4.8)** → Footer (night).
+Before/after (§4.3) was removed 2026-10-25.
 
 ### 4.1 Hero
 
@@ -445,6 +446,132 @@ Closing row (48 px below the cards, left-aligned, wrapping): primary button **"B
 
 Bottom row: 1 px `--night-line` top border, 24 px above. Copyright in `--text-small` `--mist`.
 
+### 4.8 Email signup (2026-11-03)
+
+Requirements: `docs/email-capture-spec.md` (acceptance criteria 1–8). The form POSTs to the Velo endpoint in
+`site.config.json`; this section covers only what the visitor sees. Signup is **optional** and secondary: the
+hero CTA → tool stays the primary action, and nothing here gates the tool.
+
+**Placement: its own section, between the FAQ and the footer.** In `App.tsx`: Header, Hero, HowItWorks, Studio,
+NextStep, Faq, **Signup**, Footer. Why there:
+- It is the last ask on the page. A visitor who has scrolled past the tool, the studio and the FAQ without
+  acting is the one who wants a "keep me posted" option, and that is where people expect a newsletter form.
+  Higher up, it would compete with the hero CTA and with "Book a session".
+- Band rhythm: FAQ (`--paper-2`) → signup (`--paper`) → footer (`--night`). Each band keeps a visible edge
+  without extra rules.
+- Decided against the **footer**: the night band is a utility zone (contact, language, social) and a form
+  there would double its height at 375 and need new error/disabled colours on night. Against **inside Next
+  step**: that section already has two calls to action, and a third would dilute "Book a session". Against a
+  **popup/modal** of any kind: never.
+
+**Layout, desktop (≥1024):** `--paper` section (standard padding). A 2-column grid, `minmax(0, 5fr)
+minmax(0, 7fr)`, gap 64, `align-items: start`. Left: the standard section head (eyebrow, h2, lead) with its
+bottom margin set to 0 inside the grid. Right: the form, `max-width: 560px` (the cap applies at every width,
+so the input never runs the full container between 640 and 1023; review 2026-11-03).
+
+```
+ STAY IN TOUCH                          EMAIL                                   ← .label, --ink-2
+ Hear from the studio                   ┌────────────────────────────────────┐
+ Leave your email for news about        │                                    │  52 px, 2 px --line-strong
+ studio sessions, courses and the       └────────────────────────────────────┘
+ tuner. The tuner stays free, with      [ ] Faust Studio may email me about studio sessions, courses and
+ or without it.                             tuner news, and I can unsubscribe at any time. Privacy policy ↗
+                                        ┌─────────────┐
+                                        │  Subscribe  │                          ← .btn .btn-primary
+                                        └─────────────┘
+                                        (status line appears here)
+```
+
+**Below 1024:** one column, section head first (its normal 48 px bottom margin), then the form at full
+container width. **At 375:** the input and the button stretch to the container width (the button like the
+hero's, `white-space: normal` so a long Czech label or 200% text wraps instead of overflowing, as in the §4.2
+banner). Nothing has a fixed width, so there is no horizontal scroll at 375, including at 200% text.
+
+**Form structure (DOM order = tab order):**
+1. `<label for="signup-email">` Email, styled `.label` in `--ink-2`, 8 px above the input. A real label,
+   not a placeholder. No placeholder text at all.
+2. `<input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email"
+   spellcheck="false">`. Height 52 (matches the button), `width: 100%`, padding 0 16, 2 px solid
+   `--line-strong` border, `--radius-sm`, `--paper` background, Jost 500 17 px, `--ink` text. Hover: border
+   `--ink`. Focus: the global 3 px `--focus` ring, border unchanged. Invalid (`aria-invalid="true"`): border
+   `--rust`.
+3. Field error, shown only when needed, 8 px under the input: Lucide `CircleAlert` 20 in `--rust`
+   (aria-hidden) + the message in `--text-small` `--rust`. Its `id` is in the input's `aria-describedby`.
+4. Consent row, 24 px below: a native `<input type="checkbox" id="signup-consent">` (20 × 20,
+   `accent-color: var(--rust)`, unchecked by default) in a `20px 1fr` grid with a 12 px gap, and the consent
+   sentence as its `<label>` in `--text-small` `--ink-2`. The row has `padding-block: 12px`, so the tap target
+   is ≥ 44 px tall and clicking anywhere on the sentence toggles the box. The **Privacy policy ↗** link is an
+   Outbound link placed *after* the `</label>`, inline with the sentence, not inside it (a link inside a label
+   toggles the box in some browsers and gives the checkbox a confusing name). The link renders only when
+   `faust.privacy` is set; until Faust sends the URL it is an empty string marked `TODO(verify)`, and nothing
+   is rendered. A "Privacy policy" link that goes to the wrong page under a consent box is worse than none.
+5. Honeypot: an extra text field named `website`, in a wrapper that is `aria-hidden="true"`, with
+   `tabindex="-1"` and `autocomplete="off"`, moved off-screen (not `display: none`, which some bots skip).
+   Invisible to people and to assistive tech. Sent as `"website"` in the JSON; the server rejects any value.
+6. Submit button, 24 px below the consent row: `<button type="submit" class="btn btn-primary">`. Active:
+   `translateY(1px)` like `a.btn-primary` (none under reduced motion).
+7. Status line, 16 px under the button, only when there is something to say (see states).
+
+Plus one **visually-hidden announcer**: a `<p role="status" aria-live="polite">` that lives in the section
+*outside* the `<form>`, mounted for the whole life of the section, so it survives the swap to the success view
+and screen readers register it before it ever changes. The programmer adds an `.sr-only` utility (there isn't
+one yet). Its text per state is in the table below. The visible messages are plain text; only this element
+announces.
+
+**Submit gating (criterion 1):** the button is inactive until the email is valid and the box is ticked.
+Implement with `aria-disabled="true"`, **not** the `disabled` attribute, so it stays in the tab order and a
+keyboard or screen-reader user can find out why nothing happens: activating it while incomplete (click, Enter
+on the button, or Enter in the email field) shows the *incomplete* hint on the status line, announces it, and
+moves focus to the first incomplete control. The form has `noValidate`; we show our own messages, never the
+browser's bubbles. Email validity = non-empty and the browser's `type="email"` check. Validate the email on
+blur (only if non-empty) and on an attempted submit, never while typing.
+
+**Inactive button look:** `--paper-2` background, `--ink-3` text (4.7:1, still readable), 2 px `--line-strong`
+border, `cursor: not-allowed`. It turns `--rust`/`--paper` the moment both inputs are valid, which is the
+visible "you can go" signal.
+
+**States:**
+
+| State | What the visitor sees | Button | Announcer (`role="status"`) text |
+|---|---|---|---|
+| Idle | The form as drawn. No messages. | Inactive look until valid, then primary | (empty) |
+| Incomplete submit attempt | Status line: *Enter your email and tick the box first.* Focus moves to the first incomplete control. | Inactive | Enter your email and tick the box first. |
+| Invalid email (on blur / attempt) | Field error under the input: *Enter an email address like name@example.com.* Border `--rust`, `aria-invalid`. Clears as soon as the value becomes valid. | Inactive | (the field error is read via `aria-describedby`; no announcement) |
+| Submitting | Fields unchanged, no spinner. Form `aria-busy="true"`. Further submits are ignored. If no response in 10 s, treat as a generic error (so the button never sticks on "Sending…"). | Label **Sending…**, `aria-disabled`, `--rust-press` background, `--paper` text (7.1:1) | Sending… |
+| Success | The `<form>` is replaced by a confirmation block in the same column: Lucide `MailCheck` 24 in `--rust` (aria-hidden) beside *Thanks, you're on the list.* (`--text-h3`, 600) and under it *Faust Studio will email you about studio sessions, courses and tuner news.* (`--text-body`, `--ink-2`). The block has `tabindex="-1"` and receives focus, because the focused button has just been removed. After a keyboard submit it shows the global 3 px `--ink` ring (`:focus-visible`); keep it, it tells keyboard users where they landed. After a mouse click the browser shows no ring. The section head stays. | gone | Thanks, you're on the list. |
+| Error, 400 | Status line (`CircleAlert` 20 `--rust` + `--text-small` `--rust`): *That email address wasn't accepted. Check it and try again.* Email and checkbox keep their values. Focus stays on the button. | Label **Try again**, primary look | That email address wasn't accepted. Check it and try again. |
+| Error, anything else (500, network, CORS, timeout) | Same treatment: *Something went wrong and your email wasn't saved. Please try again.* Values kept. | Label **Try again**, primary look | Something went wrong and your email wasn't saved. Please try again. |
+
+The announcer text is cleared when the form returns to idle (for example when the visitor edits the email
+after an error). Nothing here is stored: no cookie, no localStorage, no prefill (criterion 7). The request body
+uses the current UI language as `lang` and `"source": "landing"`.
+
+**Honesty (criterion 8):** the lead says the tuner stays free with or without signup; no string says "sign up to
+use", "required" or "unlock". The hero trust line ("No account") and FAQ 2 ("You can use the tuner without
+signing up") stay true because signup is on the landing page and optional; their `TODO(email)` markers stay
+(they still depend on the tool team's gate). The confirmation does not say "check your inbox": there is no
+welcome email (email-capture spec, out of scope). The button says "Subscribe", not "Sign up", so "signing up"
+keeps meaning an account in the FAQ.
+
+**Consent text versions** (keep every version here; bump the constant whenever the sentence changes, in
+either language):
+
+| Version | EN sentence | Since |
+|---|---|---|
+| `2026-11-v1` | Faust Studio may email me about studio sessions, courses and tuner news, and I can unsubscribe at any time. | 2026-11-03 |
+
+Send it as `consentVersion`. Suggested home: `SIGNUP_CONSENT_VERSION` in `src/faust.ts`, next to
+`SIGNUP_ENDPOINT`. The Czech sentence (`TODO(cs-review)`) must say the same three things (who, about what,
+unsubscribe any time) and shares the version.
+
+**Colour pairs used** (all already in §1.1): ink/paper, ink-2/paper (labels, consent), rust/paper (errors,
+icons, eyebrow), paper/rust and paper/rust-press (button), ink-3/paper-2 (inactive button),
+line-strong/paper (input and inactive-button border, 3.9:1 non-text), paper on rust for the checkbox tick.
+No new tokens.
+
+**Copy:** §5 "Email signup". Keys: `signup.*` in `copy/en.ts` / `cs.ts`.
+
+
 ---
 
 ## 5. Copy (English, final unless marked)
@@ -559,6 +686,25 @@ word appears only in the meta description, for search.
 6. **Does it work on my phone?** You can open it on a phone. Moving notes is much easier with a mouse or
    trackpad, so a laptop or desktop is best.
 
+**Email signup** (§4.8; keys `signup.*`)
+- Eyebrow: Stay in touch
+- H2: Hear from the studio
+- Lead: Leave your email for news about studio sessions, courses and the tuner. The tuner stays free, with
+  or without it.
+- Email label: Email
+- Consent (checkbox label, version `2026-11-v1`): Faust Studio may email me about studio sessions, courses
+  and tuner news, and I can unsubscribe at any time.
+- Privacy link: Privacy policy ↗ → `faust.privacy` `TODO(verify)`: Faust hasn't sent a URL; the link is not
+  rendered until it is set.
+- Button: Subscribe · while sending: Sending… · after an error: Try again
+- Incomplete hint: Enter your email and tick the box first.
+- Invalid email: Enter an email address like name@example.com.
+- Error (400): That email address wasn't accepted. Check it and try again.
+- Error (other): Something went wrong and your email wasn't saved. Please try again.
+- Success title: Thanks, you're on the list.
+- Success body: Faust Studio will email you about studio sessions, courses and tuner news.
+- Honeypot: no visible text; `name="website"`, `aria-hidden`.
+
 **Footer**
 - Description: Recording studio, residential and creative space near Prague Castle. Since 1991.
 - Studio site link: fauststudio.net ↗
@@ -628,6 +774,10 @@ loaded. Photos are not filtered or tinted. The warmth comes from the photography
 - [ ] `<html lang>` follows the language switch.
 - [ ] No horizontal scroll at 375 px in EN *and* CS. Text zoom to 200% doesn't clip anything.
 - [ ] Reduced motion: no transforms or rotations.
+- [ ] Signup form (§4.8): the email input has a `<label>`; the submit uses `aria-disabled`, not `disabled`, and
+      an incomplete attempt explains itself; every state in the §4.8 table is announced through the one
+      `role="status"` element; focus lands on the confirmation after success; the honeypot is `aria-hidden`
+      with `tabindex="-1"`; the whole form completes keyboard-only in EN and CS.
 
 ## 8. Handoff notes
 

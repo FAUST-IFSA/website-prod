@@ -4,6 +4,7 @@ import { Header } from './sections/Header'
 import { Hero } from './sections/Hero'
 import { HowItWorks } from './sections/HowItWorks'
 import { NextStep } from './sections/NextStep'
+import { Signup } from './sections/Signup'
 import { Studio } from './sections/Studio'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Studio />
         <NextStep />
         <Faq />
+        <Signup />
       </main>
       <Footer />
     </>

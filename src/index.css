@@ -775,6 +775,153 @@ details[open] .faq-icon {
   color: var(--ink-2);
 }
 
+/* ---------- §4.8 Email signup ---------- */
+
+/* Visually hidden, still read by screen readers (the form's role="status" announcer). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Below 1024: one column, section head with its normal bottom margin, form at full container width. */
+@media (min-width: 1024px) {
+  .signup-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .signup-grid .section-head {
+    margin-bottom: 0;
+  }
+}
+.signup-form,
+.signup-done {
+  max-width: 560px;
+}
+.signup-form .label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--ink-2);
+}
+.signup-input {
+  display: block;
+  appearance: none; /* no iOS inner shadow / rounded corners on type=email */
+  width: 100%;
+  height: 52px;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  font: 500 var(--text-body) / 1.2 var(--font-sans);
+  color: var(--ink);
+}
+.signup-input:hover {
+  border-color: var(--ink);
+}
+.signup-input[aria-invalid='true'] {
+  border-color: var(--rust);
+}
+.signup-error {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-top: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--rust);
+}
+.signup-error svg {
+  flex-shrink: 0;
+}
+/* 20px box + 12px gap; padding-block makes the row a ≥44px tap target. */
+.signup-consent {
+  display: grid;
+  grid-template-columns: 1.333em 1fr;
+  gap: var(--space-3);
+  align-items: start;
+  margin-top: var(--space-5);
+  padding-block: var(--space-3);
+  font-size: var(--text-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.signup-consent input {
+  width: 1.333em; /* 20px at --text-small; grows with text zoom */
+  height: 1.333em;
+  margin: 1px 0 0;
+  accent-color: var(--rust);
+}
+.signup-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.signup-form .btn {
+  margin-top: var(--space-5);
+  border: 0;
+  cursor: pointer;
+  white-space: normal; /* a long Czech label or 200% text wraps instead of overflowing */
+  text-align: center;
+  line-height: 1.2;
+  padding-block: var(--space-2);
+}
+@media (max-width: 639px) {
+  .signup-form .btn {
+    width: 100%;
+  }
+}
+button.btn-primary:active {
+  transform: translateY(1px);
+}
+.signup-form .btn.is-inactive:active {
+  transform: none; /* a control that does nothing shouldn't react */
+}
+/* Inactive until the email is valid and the box is ticked (aria-disabled, still focusable). */
+.signup-form .btn.is-inactive,
+.signup-form .btn.is-inactive:hover {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  border: 2px solid var(--line-strong);
+  cursor: not-allowed;
+}
+.signup-form .btn.is-sending,
+.signup-form .btn.is-sending:hover {
+  background: var(--rust-press);
+  color: var(--paper);
+}
+.signup-status {
+  margin-top: var(--space-4);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+.signup-status.signup-error {
+  margin-top: var(--space-4);
+}
+.signup-done {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.signup-done-icon {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--rust);
+}
+.signup-done-title {
+  font: 600 var(--text-h3) / 1.3 var(--font-sans);
+}
+.signup-done p + p {
+  margin-top: var(--space-2);
+}
+
 /* ---------- §4.7 Footer ---------- */
 
 .footer {
@@ -823,6 +970,7 @@ details[open] .faq-icon {
 
 @media (prefers-reduced-motion: reduce) {
   a.btn-primary:active,
+  button.btn-primary:active,
   a.btn-paper:active,
   .cta-box:active .btn-primary,
   .card:hover .card-photo,

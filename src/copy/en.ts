@@ -124,6 +124,25 @@ export const en = {
       },
     ],
   },
+  signup: {
+    eyebrow: 'Stay in touch',
+    heading: 'Hear from the studio',
+    lead: 'Leave your email for news about studio sessions, courses and the tuner. The tuner stays free, with or without it.',
+    emailLabel: 'Email',
+    // Consent text, version 2026-11-v1 (design-spec §4.8). Bump SIGNUP_CONSENT_VERSION whenever this changes, in either language.
+    consent: 'Faust Studio may email me about studio sessions, courses and tuner news, and I can unsubscribe at any time.',
+    // TODO(verify): href is faust.privacy; the link renders only when that URL is set.
+    privacy: 'Privacy policy',
+    submit: 'Subscribe',
+    submitting: 'Sending…',
+    retry: 'Try again',
+    incomplete: 'Enter your email and tick the box first.',
+    invalidEmail: 'Enter an email address like name@example.com.',
+    errorRejected: "That email address wasn't accepted. Check it and try again.",
+    errorGeneric: "Something went wrong and your email wasn't saved. Please try again.",
+    successTitle: "Thanks, you're on the list.",
+    successBody: 'Faust Studio will email you about studio sessions, courses and tuner news.',
+  },
   footer: {
     description: 'Recording studio, residential and creative space near Prague Castle. Since 1991.',
     contactLabel: 'Contact',

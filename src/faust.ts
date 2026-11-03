@@ -14,6 +14,8 @@ export const faust = {
   courses: 'https://www.fauststudio.net/courses',
   rates: 'https://www.fauststudio.net/rates',
   contact: 'https://www.fauststudio.net/contact',
+  // TODO(verify): privacy policy URL, asked from Faust (email-capture spec task 0). Empty = the signup form renders no link.
+  privacy: '',
   instagram: 'https://www.instagram.com/fauststudios/',
   facebook: 'https://www.facebook.com/FaustRecordsStudio/',
   email: 'faustrecords@gmail.com',
@@ -23,3 +25,9 @@ export const faust = {
 
 // Relative to the base path, so it works on GitHub Pages (/website-prod/tool/) and at a domain root (/tool/).
 export const TOOL_URL = `${import.meta.env.BASE_URL}tool/`
+
+// Where the signup form POSTs. Value: site.config.json "signupEndpoint", overridable by VITE_SIGNUP_ENDPOINT in dev.
+export const SIGNUP_ENDPOINT = import.meta.env.SIGNUP_ENDPOINT
+// Version of the consent sentence (copy signup.consent, both languages). Bump it whenever that sentence changes;
+// every version is listed in docs/design-spec.md §4.8.
+export const SIGNUP_CONSENT_VERSION = '2026-11-v1'

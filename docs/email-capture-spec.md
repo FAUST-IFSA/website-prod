@@ -1,6 +1,6 @@
 # Email capture v1: spec
 
-Owner: pm · Status: draft, not started · Date: 2026-10-29
+Owner: pm · Status: in progress (task 1 done 2026-11-03, criterion 10 passed on our test site) · Date: 2026-10-29
 Research behind it: `reports/Wix Core email capture.md` (+ notes in `research_notes/Wix Core CRM email capture/`).
 
 ## Goal
@@ -22,6 +22,8 @@ no server of ours, no secret in our page.
 
 - The signup form lives on **our landing page**, not in the tool. The tool's email gate belongs to the tool
   team; we hand them the same endpoint contract so the gate can use it later. One endpoint, two callers.
+  **User, 2026-11-03:** the form may later move into the tool instead; the landing form stands for now, and
+  `src/sections/Signup.tsx` + design-spec §4.8 double as the reference for the tool team.
 - Signup is **optional**. The tool stays free with no signup, so the FAQ answer "Do I need an account? Not
   right now" stays true. We don't gate anything.
 - v1 collects **email only** (plus language, sent automatically). No name field.
@@ -43,21 +45,32 @@ no server of ours, no secret in our page.
 ```
 POST https://www.fauststudio.net/_functions/tunerSignup
 Content-Type: application/json
-{ "email": "a@b.cz", "lang": "cs" | "en", "source": "landing" | "tool", "consent": true, "consentVersion": "2026-10-v1", "website": "" }
+{ "email": "a@b.cz", "lang": "cs" | "en", "source": "landing" | "tool", "consent": true, "consentVersion": "2026-11-v1", "website": "" }
 → 200 { "ok": true }      created, or already a contact (duplicates are a success, not an error)
 → 400 { "ok": false }     invalid email, consent not true, or honeypot ("website") filled
+→ 500 { "ok": false }     Wix refused to create the contact (e.g. the `tuner` label doesn't exist). Logged in Wix.
 → 204                     OPTIONS preflight
 ```
+The route name comes from the exported function names (`post_tunerSignup`, `options_tunerSignup`); the file must
+be named exactly `http-functions.js` under Backend. The `tuner` label **must exist** before the first call (Wix:
+"label keys must exist"); create it in Contacts → Manage labels.
 Server behaviour: allow-list origins (`https://faust-ifsa.github.io`, plus the future custom domain);
 create the contact with `labelKeys: ['custom.tuner']`, `locale` from `lang`, extended fields
 `custom.tuner-consent-at` (ISO timestamp), `custom.tuner-consent-version`, `custom.tuner-source`;
-`allowDuplicates: false`, `suppressAuth: true`. The label and the three custom fields are created once in
-Faust's Contacts dashboard (or by the function on first run if the API allows; programmer to check).
+`allowDuplicates: false`, `suppressAuth: true`. The label and the three custom fields are created by the
+function itself on first run (`findOrCreateLabel` / `findOrCreateExtendedField`, once per cold start). Decided
+2026-11-03 after testing showed Wix **silently drops unknown extended fields** (contact created, consent proof
+lost, HTTP 200), while unknown labels are refused. Nothing to create by hand in Faust's dashboard.
+Keys are **Wix's, not ours**: API-created labels/fields get a random suffix (e.g. `custom.tuner-WnXAj`), so the
+function uses the keys `findOrCreate*` returns and matches by display name. Faust must not rename the `tuner`
+label or the three fields in the dashboard, or the function would create fresh ones.
 
 ## Acceptance criteria
 
 Form (landing page):
-1. Email field + consent checkbox (unchecked by default) + submit. Submit is disabled until both are valid.
+1. Email field + consent checkbox (unchecked by default) + submit. Submit is gated until both are valid:
+   `aria-disabled` (still focusable; an incomplete attempt shows + announces a hint and moves focus to the first
+   incomplete control), not the `disabled` attribute. Designer's call, accepted 2026-11-03.
 2. Consent text states who emails (Faust Studio), about what (studio sessions, courses, tuner news), and that
    they can unsubscribe any time. Exact wording: designer, in `copy/en.ts` + `cs.ts` (`TODO(cs-review)`).
 3. States: idle, submitting (no double submit), success (form replaced by a confirmation), error (message +
@@ -83,9 +96,9 @@ Endpoint (Velo):
 | # | Task | Owner | Blocked by |
 |---|---|---|---|
 | 0 | Email Faust: ask for Dev Mode + a collaborator seat (or that they paste the file), tell them about the email-plan cost, ask for their privacy policy URL. Draft below. | pm | — |
-| 1 | Write `wix/http-functions.js` from the sketch, create a free Wix test site, test criteria 10. | programmer | — |
-| 2 | Design the form: placement on the page, states, consent wording EN. Add to `docs/design-spec.md`. | designer | — |
-| 3 | Build the form per the design spec, wired to the test-site URL via `site.config.json`. Verify 1–8 on `npm run preview`. | programmer | 1, 2 |
+| 1 | ✅ 2026-11-03. `wix/http-functions.js` + `README.md` + `test.sh`; criterion 10 passes on our test site `contactfaux400500.wixsite.com/my-site-3`. | programmer | — |
+| 2 | ✅ 2026-11-03. `docs/design-spec.md` §4.8 (layout/states) + §5 "Email signup" (copy, keys `signup.*`). Own section between FAQ and Footer. Consent text version `2026-11-v1`. | designer | — |
+| 3 | ✅ 2026-11-03. `src/sections/Signup.tsx`, copy `signup.*`. Criteria 1–8 verified on preview against the test site (EN+CS, 1280+375, axe 0), incl. live success path. Pending: user confirms contacts in test-site dashboard. | programmer | 1, 2 |
 | 4 | Install the function on Faust's site (or hand it over), switch the URL, verify criterion 11. | programmer + Faust | 0, 3 |
 | 5 | Send the endpoint contract to the tool team for their gate. | pm | 4 |
 

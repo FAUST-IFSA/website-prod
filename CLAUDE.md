@@ -156,15 +156,47 @@ Spec: `docs/email-capture-spec.md`. Install guide: `docs/email-capture-migration
   moves focus), not `disabled`. One `role="status"` announcer. Honeypot `aria-hidden` + `tabindex=-1`.
   Button says "Subscribe", not "Sign up", so the FAQ's "without signing up" keeps meaning an account. The
   privacy link is a plain link (no ↗) to our own policy page, `PRIVACY_URL`, always rendered.
-- **Privacy policy page (added 2026-11-04):** `/privacy/`, spec `docs/privacy-policy-spec.md`, layout and EN text
-  in design-spec §4.9/§5, keys `privacy.*` + `footer.privacy`. Linked from the consent row and the footer's
-  bottom row. `faust.privacy` still means Faust's *own* policy URL (empty); when set, the page shows a "see
-  also" link. Bump `PRIVACY_POLICY_VERSION` and `privacy.updated` together when the text changes in substance.
-  The policy says nothing is loaded from third parties: verified on preview for the landing page and `/tool/`
-  (upload → analysis → export, all requests same-origin). Re-verify when the tool pin moves.
+- **Privacy policy page:** our own, at `/privacy/`. See the Privacy policy section below.
 - **Not decided:** the user may later move the form into the tool instead of the landing page. `Signup.tsx`
   and design-spec §4.8 then serve as the tool team's reference. Same endpoint, `source:"tool"`.
 - **Test:** `wix/test.sh <site root or endpoint URL>` runs the criterion-10 checks with curl.
+
+## Privacy policy (added 2026-11-04)
+
+Spec: `docs/privacy-policy-spec.md` (required content, criteria, review log of what was cut and why). Layout:
+design-spec §4.9. Text: design-spec §5 "Privacy policy page" (the source; `copy/en.ts` → `privacy.*` mirrors it
+verbatim, `cs.ts` is the machine draft). Facts behind it: `reports/privacy-policy-facts.md`.
+
+- **What it is:** a second static page, `privacy/index.html` → `src/privacy.tsx` → `src/pages/Privacy.tsx`, built
+  as its own Vite entry (`rollupOptions.input`), because GitHub Pages has no SPA fallback and the site has no
+  router. It reuses `Header`, `Footer` and `LangProvider` (which takes a `title` prop so the tab title follows the
+  switch). The noindex plugin and favicons apply to it like the landing page. URL in code: `PRIVACY_URL`
+  (`faust.ts`, base-relative). Linked from the signup consent row (plain link, same tab, always rendered) and the
+  footer's bottom row (`aria-current="page"` on the policy page itself).
+- **What it says, and why each part is there.** Six sections: what it covers, the tuner, email signup, no
+  cookies/no tracking, your rights, changes. GDPR Art. 13 drives the signup and rights sections (purposes,
+  consent as legal basis, Wix as processor with the Israel adequacy decision + SCCs, retention, the rights list,
+  withdrawal, complaint to the ÚOOÚ, "optional", no automated decisions). The tuner and no-tracking sections
+  are **not** required by GDPR: they exist because "your audio never leaves your device" is the hero claim and
+  this page is where a visitor checks it.
+- **Two Art. 13 items are suspended, not met** (user decisions, 2026-11-04; text kept in design-spec §5, ids
+  `who` and `hosting` reserved): the controller's identity, until Faust says which Richard Mader / IČO (see Open
+  decisions); and the hosting disclosure, until the launch host is known (see Deploy → Later). Reinstate both
+  before the site leaves `noindex`.
+- **Honesty rules for this page:** every sentence must be true of the built site at the pinned tool commit.
+  "Nothing on this site is loaded from other companies" was verified on preview (landing + `/tool/` through
+  upload → analysis → MP3 export, every request same-origin, at `72b353a`), as were recent files living in
+  on-device IndexedDB and the tool having no email gate at all. **Re-verify all three when the pin moves.** No
+  cookie banner: nothing here needs consent (language choice in localStorage only on a click; the tool's recent
+  files), so a banner would misdescribe the site. Promises Faust must keep (delete on request, reply within a
+  month, unsubscribe link in every email) are listed in `docs/email-capture-migration.md` → "Faust's obligations".
+- **Versioning:** `PRIVACY_POLICY_VERSION` (`faust.ts`, currently `2026-11-v1`) is interpolated into
+  `privacy.updated`. Bump it and the date together when the text changes in substance; design-spec §4.9 lists
+  every version, like the consent sentences in §4.8.
+- **`faust.privacy`** still means Faust's *own* policy URL (empty: fauststudio.net has none, and its Wix cookie
+  banner is off, which is worth raising with them). When set, our page shows a "see also" link; it never
+  replaces ours.
+- **Czech:** `TODO(cs-review)` like the rest, but it is legal text: a native speaker must review it before launch.
 
 ## Content and copy rules
 

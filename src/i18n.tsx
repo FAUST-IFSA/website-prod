@@ -22,13 +22,14 @@ function initialLang(): Lang {
 
 const LangContext = createContext<{ lang: Lang; setLang: (lang: Lang) => void } | null>(null)
 
-export function LangProvider({ children }: { children: ReactNode }) {
+// `title` picks the document title from the copy, so each page (landing, privacy) keeps its own in both languages.
+export function LangProvider({ children, title = (copy) => copy.meta.title }: { children: ReactNode; title?: (copy: Copy) => string }) {
   const [lang, setLangState] = useState(initialLang)
 
   useEffect(() => {
     document.documentElement.lang = lang
-    document.title = COPY[lang].meta.title
-  }, [lang])
+    document.title = title(COPY[lang])
+  }, [lang, title])
 
   const setLang = (next: Lang) => {
     setLangState(next)

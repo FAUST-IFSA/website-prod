@@ -505,6 +505,14 @@ banner). Nothing has a fixed width, so there is no horizontal scroll at 375, inc
    toggles the box in some browsers and gives the checkbox a confusing name). The link renders only when
    `faust.privacy` is set; until Faust sends the URL it is an empty string marked `TODO(verify)`, and nothing
    is rendered. A "Privacy policy" link that goes to the wrong page under a consent box is worse than none.
+   **Update 2026-11-04 (privacy page, §4.9):** the link now points at our own policy page (`PRIVACY_URL`)
+   and is always rendered; `faust.privacy` keeps meaning Faust's own policy and the form no longer reads it.
+   It is a plain `.link`, **not** `Outbound`: the ↗ icon means "another site" (§3.1) and this one is ours.
+   It opens in the **same tab**, like every link on the site (`Outbound` already does; there is no
+   `target="_blank"` anywhere to match). Cost: the typed email isn't kept if the visitor opens the policy
+   mid-form (React state; Back doesn't restore it). Accepted: it's one field, most people read the policy
+   before typing, and Back returns to the form's scroll position. A new tab would need an "opens in a new
+   tab" announcement and break Back for everyone, to save one field for a few.
 5. Honeypot: an extra text field named `website`, in a wrapper that is `aria-hidden="true"`, with
    `tabindex="-1"` and `autocomplete="off"`, moved off-screen (not `display: none`, which some bots skip).
    Invisible to people and to assistive tech. Sent as `"website"` in the JSON; the server rejects any value.
@@ -570,6 +578,97 @@ line-strong/paper (input and inactive-button border, 3.9:1 non-text), paper on r
 No new tokens.
 
 **Copy:** §5 "Email signup". Keys: `signup.*` in `copy/en.ts` / `cs.ts`.
+
+### 4.9 Privacy policy page (2026-11-04)
+
+Requirements: `docs/privacy-policy-spec.md` (its "Required content" list is the content contract; acceptance
+criteria 1–10). This is a text page, not a new section system: it reuses the header, footer, tokens and type
+scale, and adds one article style.
+
+**URL and shell.** `<base>privacy/`, a second Vite HTML entry (no client route). DOM: `Header` as-is (not
+sticky, wordmark not a link, skip link → `#main`), then `<main id="main">` holding one
+`<article class="section privacy">` inside a `.container`, then `Footer` as-is. Own `<title>`
+(`privacy.meta.title`) and meta description; the language switch changes the title too, like `meta.title` on
+the landing page. Landing favicon. `noindex` follows `site.config.json` (programmer, criterion 8).
+
+**Measure.** The article is left-aligned in the standard container (so the h1 lines up with the header lockup
+and the footer columns) and capped at `max-width: 65ch`, the cap paragraphs already have everywhere (≈ 600 px
+at 17 px Jost). Headings, lists and paragraphs share that one measure; nothing is centred. No sidebar and no
+table of contents: six short sections (eight once "Who is responsible" and "Visiting this site" return) scan in
+under a minute, and a ToC would be a second navigation to keep
+in two languages.
+
+**Vertical rhythm, top to bottom:**
+1. **Back link** (`privacy.back`): a text link, Lucide `ArrowLeft` 16 (`aria-hidden`) before "Back to the
+   tuner page", `--text-small`, `--ink-2`, the standard rust underline. `href` = the base path
+   (`import.meta.env.BASE_URL`; the programmer may add a `LANDING_URL` next to `TOOL_URL`). It is the first
+   thing in `main`, so it's the first tab stop after the skip link and the language switch, and it's where the
+   eye lands under the header. This is the page's way home, because the header wordmark stays not-a-link
+   (§3.2). 32 px below it, the head.
+2. **Eyebrow** "Faust Studio · vocal tuner" (`.eyebrow`), then 12 px.
+3. **h1** "Privacy policy" at the `--text-h2` size (32→48, 600), **not** `--text-display`: a legal page, not a
+   hero. Then 12 px.
+4. **Updated line** "Last updated 4 November 2026 · Version 2026-11-v1", `--text-small`, `--ink-2`. The date
+   is copy (`privacy.updated`); the version is interpolated from `PRIVACY_POLICY_VERSION` so the copy can't
+   drift from the constant. Then 24 px.
+5. **Intro** paragraph (`privacy.intro`), `--text-body`, `--ink`. Then 48 px.
+6. **Sections**, in the order of the spec's "Required content" list (six since 2026-11-04: "Who is
+   responsible" is off until Faust names the controller, "Visiting this site" until the launch host is known; see §5). Each is a `<section>` with an
+   `h2` (`id` = the section id, so `privacy/#signup` can be deep-linked later) at the **`--text-h3`** size
+   (22 / 1.25 / 600): the global h2 size is for landing-page bands and would shout eight times on a text page.
+   48 px above each h2, 12 px below. Inside, in copy order: paragraphs (`p + p`: 16 px), bullet lists
+   (`ul` with `list-style: disc`, `padding-left: 1.4em`, `li + li`: 8 px, 16 px above and below the list) and
+   standalone link lines (a `<p>` holding one link). Links to other sites (GitHub, Wix, ÚOOÚ,
+   fauststudio.net) use `Outbound` (↗, same tab, §3.1); `mailto:` and our own pages use the plain `.link`.
+7. **Back link again** after the last section, 48 px above, identical to item 1 (same key, same href). A
+   reader who finishes at the bottom shouldn't scroll back up, and the footer has no landing link.
+
+Below the bottom back link is the section's standard bottom padding (64 / 96), then the footer.
+
+**Placeholders.** Unconfirmed facts render as bracketed text inline, e.g. "[Richard Mader]", with no extra
+styling (no highlight, nothing to clean up later). Each is `TODO(verify)` in the copy file. Since 2026-11-04 none are
+on the page: everything was filled from `reports/privacy-policy-facts.md` except the controller's name and IČO,
+whose section is removed until Faust answers (§5).
+
+**States.** None: static text, no data, so no loading, empty or error state. The language switch swaps the
+text in place. If `faust.privacy` is set (Faust's own policy URL), section 2 gains one "see also" link line;
+until then that line is not rendered (the same rule the consent-row link used to follow).
+
+**Responsive.** Nothing has a fixed width; the measure shrinks with the container, so there is no horizontal
+scroll at 375 px, including at 200% text size and in Czech. `overflow-wrap: anywhere` on the article so a long
+placeholder or URL can't widen the page.
+
+**Accessibility.** One h1, one h2 per section (six today), `header`/`main`/`footer` landmarks (criterion 10). Both back
+links read the same and make sense out of context. Every interactive element gets the global 3 px ring.
+Colour pairs: ink/paper and ink-2/paper only, plus the footer's night pairs. No new tokens.
+
+**Footer "Privacy policy" link (both pages, criterion 2).** It goes in the **bottom row next to the
+copyright**, not in the contact column: legal links belong with the copyright by convention, the contact
+column stays about reaching Faust, and the 3-column grid is untouched. The row keeps its 1 px `--night-line`
+top border and 24 px padding and becomes a flex row, `justify-content: space-between; flex-wrap: wrap;
+gap: 8px 24px`: copyright left (`--text-small`, `--mist`, as now), "Privacy policy" link right
+(`--text-small`, `--paper` text, `--ember` underline: the night text link). Below 640 px the row becomes a
+column (`flex-direction: column`, both left-aligned, 8 px apart; the two items are short, so wrapping alone
+would never trigger at 375). `href` = `PRIVACY_URL`. On the policy page itself the link still renders
+(criterion 2) with `aria-current="page"`: a footer that changes shape per page is more confusing than a
+self-link.
+
+```
+ ──────────────────────────────────────────────────────────────  1 px night-line
+ © 2026 Faust Studio                                Privacy policy
+```
+
+**Consent-row link.** Updated in §4.8 item 4: plain `.link`, no ↗, same tab, always rendered.
+
+**Policy versions** (keep every version here, like the consent sentences in §4.8). Bump
+`PRIVACY_POLICY_VERSION` in `src/faust.ts` and the date in `privacy.updated` (both languages) whenever the
+policy changes in substance; a typo fix doesn't bump.
+
+| Version | Last updated | What |
+|---|---|---|
+| `2026-11-v1` | 2026-11-04 | First policy: this page, the tuner at `/tool/`, email signup → Wix. Facts still `TODO(verify)`. |
+
+**Copy:** §5 "Privacy policy page". Keys: `privacy.*`, `footer.privacy`.
 
 
 ---
@@ -694,8 +793,8 @@ word appears only in the meta description, for search.
 - Email label: Email
 - Consent (checkbox label, version `2026-11-v1`): Faust Studio may email me about studio sessions, courses
   and tuner news, and I can unsubscribe at any time.
-- Privacy link: Privacy policy ↗ → `faust.privacy` `TODO(verify)`: Faust hasn't sent a URL; the link is not
-  rendered until it is set.
+- Privacy link: Privacy policy → `PRIVACY_URL`, our own page (§4.9). Plain link, no ↗, same tab, always
+  rendered (2026-11-04; was `faust.privacy`, not rendered until set).
 - Button: Subscribe · while sending: Sending… · after an error: Try again
 - Incomplete hint: Enter your email and tick the box first.
 - Invalid email: Enter an email address like name@example.com.
@@ -716,8 +815,150 @@ word appears only in the meta description, for search.
 - Language heading (label): Language
 - Social: Instagram ↗ (`https://www.instagram.com/fauststudios/`) · Facebook ↗
   (`https://www.facebook.com/FaustRecordsStudio/`)
+- Privacy policy → `PRIVACY_URL` (bottom row, next to the copyright, §4.9)
 - Copyright: © 2026 Faust Studio. `TODO(verify)`: legal owner name. fauststudio.net shows
   "© 2025 by Richard Mader jr."
+
+**Privacy policy page** (§4.9; keys `privacy.*`; written 2026-11-04, version `2026-11-v1`)
+
+Plain language, second person, short paragraphs, no legalese. Nothing here claims more than the site does
+today (spec criterion 7): GitHub does log IPs, there is no confirmation email, no encryption claim. Bracketed
+text is `TODO(verify)`. Filled 2026-11-04 from `reports/privacy-policy-facts.md`. The only brackets left were the
+controller's name and IČO in section 1, so **section 1 was removed from the page the same day (user decision: no
+brackets on the demo)**; its text stays below for reinstatement once Faust names the controller. Until then the
+page has six sections and the Art. 13(1)(a) gap is logged in the pm spec. Section 4 ("Visiting this site",
+GitHub Pages hosting) was also removed 2026-11-04 (user decision: GitHub Pages isn't the permanent host); its text
+stays below for the launch host, and its last paragraph moved to the end of "No cookies, no tracking". Never
+replace a bracket with a guess. The CS draft is machine-translated **legal** text: mark it `TODO(cs-review)` with a note that a
+native speaker must review it before the site leaves `noindex`. Keys are given as `privacy.sections[n]` with
+the section `id`; a block is a paragraph unless marked *list* or *link*.
+
+- Meta title (`privacy.meta.title`): Privacy policy · Faust Studio
+- Meta description (`privacy.meta.description`): How this site and the free vocal tuner handle your data. The
+  tuner runs in your browser and uploads nothing; your email is stored only if you subscribe.
+- Back link (`privacy.back`, top and bottom): Back to the tuner page
+- Eyebrow (`privacy.eyebrow`): Faust Studio · vocal tuner
+- H1 (`privacy.heading`): Privacy policy
+- Updated line (`privacy.updated`): Last updated 4 November 2026 · Version 2026-11-v1
+- Intro (`privacy.intro`): This page explains what happens to your data when you use the free vocal tuner
+  and the site around it, and what Faust Studio keeps if you leave your email. The short version: the tuner works
+  entirely in your browser and your audio never leaves your device. We store your email address only if you
+  subscribe, and you can unsubscribe at any time.
+
+**1 · `who` · Who is responsible** — REMOVED from the page 2026-11-04, kept here for reinstatement. Not in the
+`sections` array; the id stays reserved.
+- Faust Studio is run by [Richard Mader], a sole trader, IČO [number], Na hutích 665/8, 160 00 Praha 6,
+  Czechia. He is responsible for the personal data described on this page (the "controller", in the words of
+  the GDPR).
+- Questions and requests about your data go to Faust Studio by email:
+- *link (mailto, plain):* faustrecords@gmail.com (`faust.email`)
+- ("Faust Studio" is not a registered entity (ARES, 2026-11-04). Two sole traders at that address are the
+  candidates, and Faust must say which: **Ing. Richard Mader, IČO 10170367** (the 1991 founder) or **Richard
+  Mader, IČO 01577778** ("Richard Mader jr." in the site footer). Keep both in the `en.ts` source comment; the
+  address is the same either way, so it is filled. No DPO line: neither a DPO nor an Art. 27 representative
+  applies, researcher-confirmed.)
+
+**2 · `scope` · What this page covers**
+- This policy covers three things: the tuner's landing page, the tuner itself at /tool/, and the email signup
+  form on the landing page.
+- It does not cover fauststudio.net, Faust Studio's main site, which is run separately. Sites we link to
+  (Wix, Instagram, Facebook) have their own privacy policies.
+- (GitHub dropped from the list 2026-11-04 with the hosting section: the page no longer links to GitHub.)
+- *link (Outbound, rendered only when `faust.privacy` is set):* See also: Faust Studio's privacy policy
+
+**3 · `tuner` · The tuner**
+- The tuner runs entirely in your browser. When you open an audio file, your browser decodes it, finds the
+  notes, applies your changes and creates the download, all on your device. Nothing is uploaded: not the
+  audio, not the file name, not what you changed. There is no account and no login.
+- So that you can reopen a file later, the tuner keeps the files you have opened in your browser's own storage
+  (IndexedDB) on your device. Only your browser can read them, and they are never sent anywhere.
+- To remove them, clear this site's data in your browser's privacy settings (usually under "Cookies and site
+  data" or "Website data"). Do the same if you used the tuner on a shared computer.
+- (The recent-files and nothing-uploaded sentences were checked at autotuner `e255279`, `storage/recent.ts`.
+  `site.config.json` now pins `72b353a`; the programmer re-confirms both at that commit during the criterion-9
+  run. Hold the text unless they report a difference.)
+
+**4 · `hosting` · Visiting this site** — REMOVED from the page 2026-11-04, kept here for the launch host. Not in
+the `sections` array; the id stays reserved. Its last paragraph ("Nothing on this site…") moved to section 6.
+- This site, including the tuner, is hosted on GitHub Pages, a service of GitHub, Inc. Like almost every web
+  host, GitHub records the IP address of each visitor in its server logs, to keep the service secure and
+  running. We don't see these logs and don't use them. GitHub handles them under its own privacy statement.
+- The legal basis is our legitimate interest in running the site (GDPR Article 6(1)(f)). GitHub keeps these
+  logs only as long as it needs them for security and publishes no fixed period. GitHub is based in the
+  United States; the transfer rests on its certification under the EU-US Data Privacy Framework.
+- *link (Outbound):* GitHub's privacy statement → `faust.githubPrivacy` (constant deleted with the section;
+  re-add it, `https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement`, on
+  reinstatement, and put GitHub back in section 2's list)
+
+**5 · `signup` · Email signup**
+- Leaving your email is optional. The tuner is free and works exactly the same with or without it.
+- If you subscribe, Faust Studio stores:
+- *list:*
+  - your email address
+  - the language you were using (English or Czech)
+  - the date and time you ticked the consent box
+  - the version of the consent sentence you agreed to
+  - which page you signed up from
+- We don't record your IP address or browser details with your signup.
+- We use this to email you news about studio sessions, courses and the tuner. The legal basis is your consent
+  (GDPR Article 6(1)(a)), which you give by ticking the box. The box is never pre-ticked.
+- Faust Studio's contact list lives in Wix, the platform that hosts fauststudio.net. Wix.com Ltd., based in
+  Israel, processes it on Faust Studio's behalf and stores it in data centres in the United States and Ireland.
+  The EU recognises Israel as having adequate data protection; transfers to the United States are covered by
+  EU standard contractual clauses under Wix's data-processing terms.
+- *link (Outbound):* Wix's privacy policy → `faust.wixPrivacy`
+- We keep your email until you unsubscribe or ask us to delete it.
+- Every email we send has an unsubscribe link. You can also withdraw your consent at any time by writing to
+  the email address under "Your rights". Withdrawing stops future emails; it doesn't affect what was sent while
+  your consent was valid.
+- (The "until you unsubscribe or ask" sentence is the spec's promise, not a fact slot, so it isn't bracketed.
+  Mark it `TODO(verify)` in the source: Faust has to confirm they will delete on request, and the handover
+  in `email-capture-migration.md` must say so.)
+
+**6 · `cookies` · No cookies, no tracking**
+- This site sets no cookies, runs no analytics and has no trackers or embedded social media buttons. We don't
+  build profiles of you and make no automated decisions about you.
+- Two things are stored in your browser, and only there:
+- *list:*
+  - your language choice (English or Czech), saved in your browser's local storage only when you click the
+    EN/CS switch
+  - the tuner's recent files (see "The tuner" above)
+- Both stay on your device and go away when you clear this site's data.
+- Nothing on this site is loaded from other companies. The fonts, scripts and images all come from the site
+  itself, so no third party learns that you visited.
+- (The last paragraph was section 4's closing paragraph until that section was removed, 2026-11-04. It depends
+  on spec criterion 9, the programmer's zero-other-origin check of the landing page **and** `/tool/`
+  (verified at pin `72b353a`). If the tool ever fetches anything external, this paragraph changes; tell the
+  designer.)
+
+**7 · `rights` · Your rights**
+- Under the GDPR you can ask Faust Studio to:
+- *list:*
+  - tell you what data it holds about you and give you a copy (access)
+  - correct it (rectification)
+  - delete it (erasure)
+  - limit how it is used (restriction)
+  - send it to you or to another provider in a common file format (portability)
+  - stop using it (objection)
+- You can also withdraw your consent at any time.
+- To do any of this, email Faust Studio:
+- *link (mailto, plain):* faustrecords@gmail.com (`faust.email`)
+- You'll get a reply within one month, as the GDPR requires.
+- (Was "email the address in section 1" until section 1 was removed, 2026-11-04.)
+- If you think your data has been handled wrongly, you can complain to the Czech data protection authority,
+  the Úřad pro ochranu osobních údajů, Pplk. Sochora 27, 170 00 Praha 7.
+- *link (Outbound):* uoou.gov.cz → `faust.uoou`
+
+**8 · `changes` · Changes to this policy**
+- When this policy changes, the date and version number at the top of the page change with it. The current
+  version is 2026-11-v1.
+- If you subscribed, the version of the consent sentence you agreed to is stored with your email, so we can
+  always tell which wording you saw.
+
+Language-independent values (`src/faust.ts`, not copy): `PRIVACY_URL`, `PRIVACY_POLICY_VERSION`,
+`faust.wixPrivacy`, `faust.uoou` (confirmed by the researcher 2026-11-04; `faust.githubPrivacy` was deleted with
+the hosting section),
+`faust.email`, `faust.privacy`.
 
 **Sources** (for the `TODO(verify)` review): fauststudio.net home, `/kopie-about`, `/blue-studio`,
 `/green-studio`, `/rates`, `/courses`, `/references`, `/contact`, all read 2026-10-20. Tool facts come from
@@ -778,6 +1019,8 @@ loaded. Photos are not filtered or tinted. The warmth comes from the photography
       an incomplete attempt explains itself; every state in the §4.8 table is announced through the one
       `role="status"` element; focus lands on the confirmation after success; the honeypot is `aria-hidden`
       with `tabindex="-1"`; the whole form completes keyboard-only in EN and CS.
+- [ ] Privacy page (§4.9): one h1 and one h2 per section (six while "Who" and "Visiting this site" are removed) in spec order; both back links work; the language switch
+      changes the `<title>`; the footer legal row wraps at 375 without horizontal scroll, in CS too.
 
 ## 8. Handoff notes
 

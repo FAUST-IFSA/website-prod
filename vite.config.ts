@@ -6,6 +6,12 @@ import site from './site.config.json' with { type: 'json' }
 export default defineConfig(({ mode }) => ({
   // The base path lives only in site.config.json; scripts/build-tool.mjs reads it too.
   base: site.base,
+  build: {
+    rollupOptions: {
+      // Two static pages: GitHub Pages has no SPA fallback, so /privacy/ must be its own HTML file.
+      input: { landing: 'index.html', privacy: 'privacy/index.html' },
+    },
+  },
   define: {
     // Where the signup form POSTs (docs/email-capture-spec.md). site.config.json holds the real URL; a
     // VITE_SIGNUP_ENDPOINT env var (shell or .env.local, both gitignored) overrides it so `npm run dev` can

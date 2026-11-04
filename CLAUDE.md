@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-11-03 (email capture).
+Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-11-04 (privacy policy page).
 
 ## What this is
 
@@ -42,17 +42,20 @@ violations in EN and CS, and no horizontal scroll at 375 px.
 ```
 site.config.json        THE config: base path + signup endpoint URL + pinned autotuner commit (see below)
 index.html              landing entry; meta description, title, robots meta
+privacy/index.html      second Vite entry -> /privacy/ (a static file, not a route: Pages has no SPA fallback)
 vite.config.ts          reads base + signupEndpoint from site.config.json (VITE_SIGNUP_ENDPOINT overrides)
 scripts/build-tool.mjs  fetches + builds the pinned autotuner into dist/tool/
 wix/                    the Velo HTTP function Faust pastes into their Wix site + README + test.sh (see Email capture)
 src/
   App.tsx               section order: Header, Hero, HowItWorks, Studio, NextStep, Faq, Signup, Footer
+  privacy.tsx           entry for /privacy/: LangProvider (with the page's own title) + pages/Privacy
+  pages/Privacy.tsx     the privacy policy page: Header, article from copy privacy.*, Footer (design-spec §4.9)
   sections/*.tsx        one file per page section (Signup.tsx = email form, design-spec §4.8)
   components.tsx        SectionHead, Outbound link, LangSwitch, etc.
   copy/en.ts, cs.ts     ALL visible text. cs must have the same shape as en (enforced by tsc)
   i18n.tsx              language context: useCopy(), useLang()
-  faust.ts              Faust facts/links + TOOL_URL, SIGNUP_ENDPOINT, SIGNUP_CONSENT_VERSION, privacy URL.
-                        brandName = footer wordmark, headerBrandName = header
+  faust.ts              Faust facts/links + TOOL_URL, PRIVACY_URL, SIGNUP_ENDPOINT, SIGNUP_CONSENT_VERSION,
+                        PRIVACY_POLICY_VERSION. brandName = footer wordmark, headerBrandName = header
   vite-env.d.ts         types for import.meta.env.SIGNUP_ENDPOINT
   index.css             design tokens (CSS custom properties) + all styles
   assets/               logo art (PNG originals + resized WebP), favicon-32/48.png, apple-touch-icon.png,
@@ -62,9 +65,11 @@ docs/
   design-spec.md        designer spec: tokens, fonts, section layouts, final EN copy, asset list (A1–A8)
   email-capture-spec.md       pm spec for the signup form + Velo endpoint: contract, criteria, task status
   email-capture-migration.md  step-by-step install on Faust's real site, with what failed on the test site
+  privacy-policy-spec.md      pm spec for the /privacy/ page: required content (GDPR Art. 13), criteria, tasks
 .github/workflows/deploy.yml   GitHub Pages deploy on push to main
 Team-Docs/              proposal, market research, project description, team diagnostic (not site code)
-reports/                research write-ups (Wix integration options, tool theme-colour findings)
+reports/                research write-ups (Wix integration options, tool theme-colour findings,
+                        privacy-policy-facts.md = sourced facts behind the policy text)
 webdesign.md            early design ideas/inspiration (superseded where design-spec.md disagrees)
 TODO.md                 old team todo list (mostly superseded)
 ```
@@ -73,9 +78,9 @@ TODO.md                 old team todo list (mostly superseded)
 
 - **Repo:** https://github.com/FAUST-IFSA/autotuner (public). A local clone may exist at `../autotuner`
   (`/Users/fin/autotuner`), but the build doesn't use it.
-- **Pin:** `site.config.json` → `autotuner.commit` (a full SHA). Currently `e255279…` on branch
-  **`aidan/pitch-engine`, which is not merged to `main`**. If that branch is deleted or force-pushed, the pinned
-  commit may become unfetchable and the build breaks. Ask the tool team to merge or tag it.
+- **Pin:** `site.config.json` → `autotuner.commit` (a full SHA). Currently `72b353a…`, which is on the tool
+  repo's `main` (checked 2026-11-04 via the compare API: 17 behind, 0 ahead), so the old unmerged-branch risk no
+  longer applies. If a future pin points at an unmerged branch again, ask the tool team to merge or tag it.
 - **Build (`scripts/build-tool.mjs`):** shallow-fetches the SHA into `.autotuner/` (gitignored), runs
   `npm ci` there (required, because its postinstall copies the Basic Pitch model and tfjs WASM files into the
   tool's `public/`), then `vite build --base=<base>tool/ --outDir dist/tool`. The install is cached per commit
@@ -109,7 +114,9 @@ TODO.md                 old team todo list (mostly superseded)
   HTML has exactly one `<head>`). Set it to `false` for a real launch. Don't use a robots.txt Disallow: it would
   hide the noindex from crawlers.
 - **Later (production):** probably Vercel + a custom domain. Set `base` to `/`, remove the noindex, and the
-  same build works. No Next.js: the team chose Vite to match the tool.
+  same build works. No Next.js: the team chose Vite to match the tool. The privacy policy then needs its
+  "Visiting this site" (hosting) section back for the launch host: any host logs IPs, so name the processor, the
+  legitimate-interest basis and the transfer safeguard (removed 2026-11-04 because GitHub Pages isn't permanent).
 - **GitHub Pages limits:** static files only. No server, no custom headers, no SPA fallback. So: no
   client-side routes (the language is state, not a URL), and no backend of ours; email collection POSTs to a
   Velo function on Faust's Wix site instead (see Email capture).
@@ -148,7 +155,13 @@ Spec: `docs/email-capture-spec.md`. Install guide: `docs/email-capture-migration
 - **Form a11y decisions:** submit uses `aria-disabled` (focusable; an incomplete attempt announces a hint and
   moves focus), not `disabled`. One `role="status"` announcer. Honeypot `aria-hidden` + `tabindex=-1`.
   Button says "Subscribe", not "Sign up", so the FAQ's "without signing up" keeps meaning an account. The
-  privacy link renders only once `faust.privacy` has a URL.
+  privacy link is a plain link (no ↗) to our own policy page, `PRIVACY_URL`, always rendered.
+- **Privacy policy page (added 2026-11-04):** `/privacy/`, spec `docs/privacy-policy-spec.md`, layout and EN text
+  in design-spec §4.9/§5, keys `privacy.*` + `footer.privacy`. Linked from the consent row and the footer's
+  bottom row. `faust.privacy` still means Faust's *own* policy URL (empty); when set, the page shows a "see
+  also" link. Bump `PRIVACY_POLICY_VERSION` and `privacy.updated` together when the text changes in substance.
+  The policy says nothing is loaded from third parties: verified on preview for the landing page and `/tool/`
+  (upload → analysis → export, all requests same-origin). Re-verify when the tool pin moves.
 - **Not decided:** the user may later move the form into the tool instead of the landing page. `Signup.tsx`
   and design-spec §4.8 then serve as the tool team's reference. Same endpoint, `source:"tool"`.
 - **Test:** `wix/test.sh <site root or endpoint URL>` runs the criterion-10 checks with curl.
@@ -223,9 +236,15 @@ Spec: `docs/email-capture-spec.md`. Install guide: `docs/email-capture-migration
 ## Open decisions / known gaps
 
 - **Email collection:** solved in principle (see Email capture): emails go to Faust's Wix Contacts. Waiting on
-  Faust: Dev Mode + paste the file (or a collaborator seat), their privacy-policy URL, and their custom domain
-  for the origin allow-list. Contacts arrive "Never subscribed"; flipping them is Faust's dashboard toggle.
+  Faust: Dev Mode + paste the file (or a collaborator seat) and their custom domain for the origin allow-list.
+  The privacy link no longer waits on Faust (it's our page); their own policy URL is optional (`faust.privacy`). Contacts arrive "Never subscribed"; flipping them is Faust's dashboard toggle.
   The tool's own email gate is still a stub; it gets the same endpoint contract once Faust's install is verified.
+- **Privacy policy facts:** which Richard Mader / IČO is the controller (founder 10170367 or jr. 01577778, see
+  `reports/privacy-policy-facts.md`) is Faust's call. Until they answer, the "Who is responsible" section is
+  **removed** from the page (user decision, 2026-11-04); the candidates sit in a comment above `privacy.sections`
+  in `en.ts`, and the §5 text is restored once Faust confirms.
+  The CS policy is machine-translated **legal** text: a native speaker must review it before the site leaves
+  `noindex`. Who does that (Faust or a teammate) is undecided.
 - **Naming:** "Faust Studio" vs "Faust Records" (the client site uses both). The user's call so far: only the
   header wordmark reads "FAUST RECORDS", matching fauststudio.net. The footer, copy, title and copyright stay
   "Faust Studio" until this is settled. Also the session/course prices

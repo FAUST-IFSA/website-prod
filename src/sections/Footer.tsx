@@ -1,7 +1,7 @@
 import emblem1x from '../assets/faust-dark-96.webp'
 import emblem2x from '../assets/faust-dark-192.webp'
 import { LangSwitch, Outbound } from '../components'
-import { faust } from '../faust'
+import { faust, PRIVACY_URL } from '../faust'
 import { useCopy } from '../i18n'
 
 export function Footer() {
@@ -60,7 +60,13 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <p className="copyright">{footer.copyright}</p>
+        <div className="copyright">
+          <p>{footer.copyright}</p>
+          {/* aria-current marks the link on the policy page itself. */}
+          <a className="link" href={PRIVACY_URL} aria-current={location.pathname.startsWith(PRIVACY_URL) ? 'page' : undefined}>
+            {footer.privacy}
+          </a>
+        </div>
       </div>
     </footer>
   )

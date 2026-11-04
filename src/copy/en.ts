@@ -1,4 +1,4 @@
-import { faust } from '../faust'
+import { faust, PRIVACY_POLICY_VERSION } from '../faust'
 
 // Final English copy from docs/design-spec.md §5. Visible copy says "the tuner", never "Auto-Tune" (TODO(name)).
 export const en = {
@@ -131,7 +131,7 @@ export const en = {
     emailLabel: 'Email',
     // Consent text, version 2026-11-v1 (design-spec §4.8). Bump SIGNUP_CONSENT_VERSION whenever this changes, in either language.
     consent: 'Faust Studio may email me about studio sessions, courses and tuner news, and I can unsubscribe at any time.',
-    // TODO(verify): href is faust.privacy; the link renders only when that URL is set.
+    // Links to our policy page (PRIVACY_URL).
     privacy: 'Privacy policy',
     submit: 'Subscribe',
     submitting: 'Sending…',
@@ -150,6 +150,115 @@ export const en = {
     phoneNote: '(Czech and English)',
     address: 'Na hutích 665/8, Prague, Czechia',
     copyright: '© 2026 Faust Studio',
+    privacy: 'Privacy policy',
+  },
+  // Privacy policy page (/privacy/): docs/privacy-policy-spec.md, design-spec §4.9 (layout) and §5 (this text).
+  // A block is a paragraph (string), a bullet list (string[]) or a standalone link line ({ label, href }).
+  privacy: {
+    meta: {
+      title: 'Privacy policy · Faust Studio',
+      description: 'How this site and the free vocal tuner handle your data. The tuner runs in your browser and uploads nothing; your email is stored only if you subscribe.',
+    },
+    back: 'Back to the tuner page',
+    eyebrow: 'Faust Studio · vocal tuner',
+    heading: 'Privacy policy',
+    // Bump the date here (both languages) and PRIVACY_POLICY_VERSION together; every version is listed in design-spec §4.9.
+    updated: `Last updated 4 November 2026 · Version ${PRIVACY_POLICY_VERSION}`,
+    intro:
+      'This page explains what happens to your data when you use the free vocal tuner and the site around it, and what Faust Studio keeps if you leave your email. The short version: the tuner works entirely in your browser and your audio never leaves your device. We store your email address only if you subscribe, and you can unsubscribe at any time.',
+    // Rendered in the "scope" section only when faust.privacy is set.
+    seeAlso: "See also: Faust Studio's privacy policy",
+    // The "Who is responsible" section was removed by the user (2026-11-04) until Faust says which sole trader is the
+    // controller. TODO(verify): Ing. Richard Mader, IČO 10170367 (founder) / Richard Mader, IČO 01577778 (jr.); address
+    // Na hutích 665/8, 160 00 Praha 6. Restore the section (design-spec §5) when they answer.
+    // The "Visiting this site" (hosting) section was removed too (user decision, 2026-11-04): GitHub Pages isn't the
+    // permanent host. The launch host needs one back (processor, legitimate interest, transfer safeguard); see CLAUDE.md.
+    sections: [
+      {
+        id: 'scope',
+        heading: 'What this page covers',
+        blocks: [
+          "This policy covers three things: the tuner's landing page, the tuner itself at /tool/, and the email signup form on the landing page.",
+          "It does not cover fauststudio.net, Faust Studio's main site, which is run separately. Sites we link to (Wix, Instagram, Facebook) have their own privacy policies.",
+        ],
+      },
+      {
+        id: 'tuner',
+        heading: 'The tuner',
+        // True at the pinned autotuner commit (storage/recent.ts). Re-check when the pin moves.
+        blocks: [
+          'The tuner runs entirely in your browser. When you open an audio file, your browser decodes it, finds the notes, applies your changes and creates the download, all on your device. Nothing is uploaded: not the audio, not the file name, not what you changed. There is no account and no login.',
+          "So that you can reopen a file later, the tuner keeps the files you have opened in your browser's own storage (IndexedDB) on your device. Only your browser can read them, and they are never sent anywhere.",
+          'To remove them, clear this site\'s data in your browser\'s privacy settings (usually under "Cookies and site data" or "Website data"). Do the same if you used the tuner on a shared computer.',
+        ],
+      },
+      {
+        id: 'signup',
+        heading: 'Email signup',
+        blocks: [
+          'Leaving your email is optional. The tuner is free and works exactly the same with or without it.',
+          'If you subscribe, Faust Studio stores:',
+          [
+            'your email address',
+            'the language you were using (English or Czech)',
+            'the date and time you ticked the consent box',
+            'the version of the consent sentence you agreed to',
+            'which page you signed up from',
+          ],
+          "We don't record your IP address or browser details with your signup.",
+          'We use this to email you news about studio sessions, courses and the tuner. The legal basis is your consent (GDPR Article 6(1)(a)), which you give by ticking the box. The box is never pre-ticked.',
+          "Faust Studio's contact list lives in Wix, the platform that hosts fauststudio.net. Wix.com Ltd., based in Israel, processes it on Faust Studio's behalf and stores it in data centres in the United States and Ireland. The EU recognises Israel as having adequate data protection; transfers to the United States are covered by EU standard contractual clauses under Wix's data-processing terms.",
+          { label: "Wix's privacy policy", href: faust.wixPrivacy },
+          // TODO(verify): Faust must confirm they delete on request (handover note in docs/email-capture-migration.md).
+          'We keep your email until you unsubscribe or ask us to delete it.',
+          "Every email we send has an unsubscribe link. You can also withdraw your consent at any time by writing to the email address under \"Your rights\". Withdrawing stops future emails; it doesn't affect what was sent while your consent was valid.",
+        ],
+      },
+      {
+        id: 'cookies',
+        heading: 'No cookies, no tracking',
+        blocks: [
+          "This site sets no cookies, runs no analytics and has no trackers or embedded social media buttons. We don't build profiles of you and make no automated decisions about you.",
+          'Two things are stored in your browser, and only there:',
+          [
+            "your language choice (English or Czech), saved in your browser's local storage only when you click the EN/CS switch",
+            'the tuner\'s recent files (see "The tuner" above)',
+          ],
+          "Both stay on your device and go away when you clear this site's data.",
+          // Verified by the programmer on preview (spec criterion 9): the landing page and /tool/ request nothing off-origin.
+          'Nothing on this site is loaded from other companies. The fonts, scripts and images all come from the site itself, so no third party learns that you visited.',
+        ],
+      },
+      {
+        id: 'rights',
+        heading: 'Your rights',
+        blocks: [
+          'Under the GDPR you can ask Faust Studio to:',
+          [
+            'tell you what data it holds about you and give you a copy (access)',
+            'correct it (rectification)',
+            'delete it (erasure)',
+            'limit how it is used (restriction)',
+            'send it to you or to another provider in a common file format (portability)',
+            'stop using it (objection)',
+          ],
+          'You can also withdraw your consent at any time.',
+          'To do any of this, email Faust Studio:',
+          { label: faust.email, href: `mailto:${faust.email}` },
+          "You'll get a reply within one month, as the GDPR requires.",
+          'If you think your data has been handled wrongly, you can complain to the Czech data protection authority, the Úřad pro ochranu osobních údajů, Pplk. Sochora 27, 170 00 Praha 7.',
+          { label: 'uoou.gov.cz', href: faust.uoou },
+        ],
+      },
+      {
+        id: 'changes',
+        heading: 'Changes to this policy',
+        blocks: [
+          `When this policy changes, the date and version number at the top of the page change with it. The current version is ${PRIVACY_POLICY_VERSION}.`,
+          'If you subscribed, the version of the consent sentence you agreed to is stored with your email, so we can always tell which wording you saw.',
+        ],
+      },
+    ],
   },
 }
 

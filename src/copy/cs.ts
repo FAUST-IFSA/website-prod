@@ -1,4 +1,4 @@
-import { faust } from '../faust'
+import { faust, PRIVACY_POLICY_VERSION } from '../faust'
 import type { Copy } from './en'
 
 // TODO(cs-review): the whole file is a draft translation of en.ts and needs a native Czech speaker's review.
@@ -165,5 +165,106 @@ export const cs: Copy = bindOneLetterWords({
     phoneNote: '(česky a anglicky)',
     address: 'Na hutích 665/8, Praha, Česko',
     copyright: '© 2026 Faust Studio',
+    privacy: 'Ochrana osobních údajů',
+  },
+  // TODO(cs-review): strojový překlad PRÁVNÍHO textu (zásady ochrany osobních údajů podle GDPR). Před tím, než
+  // web opustí noindex, ho MUSÍ zkontrolovat rodilý mluvčí, ideálně s právním povědomím. Předloha: design-spec §5.
+  privacy: {
+    meta: {
+      title: 'Ochrana osobních údajů · Faust Studio',
+      description: 'Jak tento web a bezplatný nástroj na ladění zpěvu nakládají s vašimi daty. Nástroj běží ve vašem prohlížeči a nic nenahrává; váš e-mail ukládáme jen tehdy, když se přihlásíte k odběru.',
+    },
+    back: 'Zpět na stránku nástroje',
+    eyebrow: 'Faust Studio · ladění zpěvu',
+    heading: 'Ochrana osobních údajů',
+    updated: `Poslední aktualizace 4. listopadu 2026 · Verze ${PRIVACY_POLICY_VERSION}`,
+    intro:
+      'Tato stránka vysvětluje, co se děje s vašimi daty, když používáte bezplatný nástroj na ladění zpěvu a web kolem něj, a co si Faust Studio uchová, pokud nám necháte svůj e-mail. Stručně: nástroj pracuje výhradně ve vašem prohlížeči a vaše nahrávka nikdy neopustí vaše zařízení. Vaši e-mailovou adresu ukládáme jen tehdy, když se přihlásíte k odběru, a odběr můžete kdykoli zrušit.',
+    seeAlso: 'Viz také: zásady ochrany osobních údajů Faust Studia',
+    // Části „Kdo za zpracování odpovídá“ a „Návštěva tohoto webu“ jsou odstraněny (viz komentář v en.ts).
+    sections: [
+      {
+        id: 'scope',
+        heading: 'Čeho se tato stránka týká',
+        blocks: [
+          'Tyto zásady se týkají tří věcí: úvodní stránky nástroje, samotného nástroje na adrese /tool/ a formuláře pro přihlášení k e-mailům na úvodní stránce.',
+          'Netýkají se webu fauststudio.net, hlavního webu Faust Studia, který je provozován samostatně. Weby, na které odkazujeme (Wix, Instagram, Facebook), mají vlastní zásady ochrany osobních údajů.',
+        ],
+      },
+      {
+        id: 'tuner',
+        heading: 'Nástroj',
+        blocks: [
+          'Nástroj běží výhradně ve vašem prohlížeči. Když otevřete zvukový soubor, váš prohlížeč ho dekóduje, najde noty, použije vaše úpravy a vytvoří soubor ke stažení, to vše ve vašem zařízení. Nic se nenahrává na server: ani nahrávka, ani název souboru, ani to, co jste změnili. Není tu žádný účet ani přihlášení.',
+          'Abyste mohli soubor později znovu otevřít, nástroj si otevřené soubory uchovává ve vlastním úložišti vašeho prohlížeče (IndexedDB) ve vašem zařízení. Číst je může jen váš prohlížeč a nikam se neodesílají.',
+          'Odstraníte je vymazáním dat tohoto webu v nastavení soukromí vašeho prohlížeče (obvykle pod „Cookies a data webů“ nebo „Data webových stránek“). Totéž udělejte, pokud jste nástroj používali na sdíleném počítači.',
+        ],
+      },
+      {
+        id: 'signup',
+        heading: 'Přihlášení k e-mailům',
+        blocks: [
+          'Zanechat e-mail je dobrovolné. Nástroj je zdarma a funguje úplně stejně s ním i bez něj.',
+          'Pokud se přihlásíte k odběru, Faust Studio uloží:',
+          [
+            'vaši e-mailovou adresu',
+            'jazyk, který jste používali (angličtina nebo čeština)',
+            'datum a čas, kdy jste zaškrtli políčko souhlasu',
+            'verzi věty se souhlasem, se kterou jste souhlasili',
+            'ze které stránky jste se přihlásili',
+          ],
+          'K vašemu přihlášení nezaznamenáváme IP adresu ani údaje o prohlížeči.',
+          'Údaje používáme k tomu, abychom vám e-mailem posílali novinky o studiových nahrávkách, kurzech a nástroji. Právním základem je váš souhlas (čl. 6 odst. 1 písm. a) GDPR), který dáváte zaškrtnutím políčka. Políčko není nikdy předem zaškrtnuté.',
+          'Seznam kontaktů Faust Studia je uložen ve Wixu, platformě, která hostuje fauststudio.net. Společnost Wix.com Ltd. se sídlem v Izraeli ho zpracovává jménem Faust Studia a ukládá ho v datových centrech ve Spojených státech a Irsku. EU uznává Izrael za zemi s odpovídající úrovní ochrany údajů; předání do Spojených států je kryto standardními smluvními doložkami EU podle podmínek zpracování údajů společnosti Wix.',
+          { label: 'Zásady ochrany soukromí Wixu', href: faust.wixPrivacy },
+          // TODO(verify): Faust must confirm they delete on request (handover note in docs/email-capture-migration.md).
+          'Váš e-mail uchováváme, dokud se neodhlásíte nebo nás nepožádáte o jeho smazání.',
+          'Každý e-mail, který posíláme, obsahuje odkaz pro odhlášení. Souhlas můžete také kdykoli odvolat e-mailem na adresu uvedenou v části „Vaše práva“. Odvolání zastaví další e-maily; netýká se toho, co bylo odesláno, dokud váš souhlas platil.',
+        ],
+      },
+      {
+        id: 'cookies',
+        heading: 'Žádné cookies, žádné sledování',
+        blocks: [
+          'Tento web nenastavuje žádné cookies, neprovozuje žádnou analytiku a nemá žádné sledovací prvky ani vložená tlačítka sociálních sítí. Nevytváříme o vás profily a neděláme o vás žádná automatizovaná rozhodnutí.',
+          'Ve vašem prohlížeči, a pouze tam, se ukládají dvě věci:',
+          [
+            'vaše volba jazyka (angličtina nebo čeština), uložená v místním úložišti prohlížeče jen tehdy, když kliknete na přepínač EN/CS',
+            'nedávné soubory nástroje (viz „Nástroj“ výše)',
+          ],
+          'Obojí zůstává ve vašem zařízení a zmizí, když vymažete data tohoto webu.',
+          'Nic na tomto webu se nenačítá od jiných společností. Písma, skripty i obrázky pocházejí ze samotného webu, takže se žádná třetí strana nedozví, že jste ho navštívili.',
+        ],
+      },
+      {
+        id: 'rights',
+        heading: 'Vaše práva',
+        blocks: [
+          'Podle GDPR můžete Faust Studio požádat, aby:',
+          [
+            'vám sdělilo, jaké údaje o vás má, a dalo vám jejich kopii (přístup)',
+            'je opravilo (oprava)',
+            'je smazalo (výmaz)',
+            'omezilo jejich používání (omezení zpracování)',
+            'vám je nebo jinému poskytovateli poslalo v běžném formátu souboru (přenositelnost)',
+            'je přestalo používat (námitka)',
+          ],
+          'Svůj souhlas můžete také kdykoli odvolat.',
+          'Pro kterýkoli z těchto kroků napište Faust Studiu:',
+          { label: faust.email, href: `mailto:${faust.email}` },
+          'Odpověď dostanete do jednoho měsíce, jak vyžaduje GDPR.',
+          'Pokud si myslíte, že s vašimi údaji bylo nakládáno nesprávně, můžete podat stížnost u českého dozorového úřadu, Úřadu pro ochranu osobních údajů, Pplk. Sochora 27, 170 00 Praha 7.',
+          { label: 'uoou.gov.cz', href: faust.uoou },
+        ],
+      },
+      {
+        id: 'changes',
+        heading: 'Změny těchto zásad',
+        blocks: [
+          `Když se tyto zásady změní, změní se s nimi i datum a číslo verze v horní části stránky. Aktuální verze je ${PRIVACY_POLICY_VERSION}.`,
+          'Pokud jste se přihlásili k odběru, verze věty se souhlasem, se kterou jste souhlasili, je uložena spolu s vaším e-mailem, takže vždy víme, jaké znění jste viděli.',
+        ],
+      },
+    ],
   },
 })

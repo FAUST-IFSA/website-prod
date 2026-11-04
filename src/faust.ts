@@ -14,8 +14,12 @@ export const faust = {
   courses: 'https://www.fauststudio.net/courses',
   rates: 'https://www.fauststudio.net/rates',
   contact: 'https://www.fauststudio.net/contact',
-  // TODO(verify): privacy policy URL, asked from Faust (email-capture spec task 0). Empty = the signup form renders no link.
+  // TODO(verify): Faust's own privacy policy URL, asked from Faust (email-capture spec task 0). Our own policy is
+  // PRIVACY_URL below; when this is set, our policy links to it as "see also" (docs/privacy-policy-spec.md).
   privacy: '',
+  // External policies our privacy page links to (confirmed by the researcher, reports/privacy-policy-facts.md).
+  wixPrivacy: 'https://www.wix.com/about/privacy',
+  uoou: 'https://uoou.gov.cz/',
   instagram: 'https://www.instagram.com/fauststudios/',
   facebook: 'https://www.facebook.com/FaustRecordsStudio/',
   email: 'faustrecords@gmail.com',
@@ -25,9 +29,13 @@ export const faust = {
 
 // Relative to the base path, so it works on GitHub Pages (/website-prod/tool/) and at a domain root (/tool/).
 export const TOOL_URL = `${import.meta.env.BASE_URL}tool/`
+// Our privacy policy page (privacy/index.html), linked from the footer and the signup consent row.
+export const PRIVACY_URL = `${import.meta.env.BASE_URL}privacy/`
 
 // Where the signup form POSTs. Value: site.config.json "signupEndpoint", overridable by VITE_SIGNUP_ENDPOINT in dev.
 export const SIGNUP_ENDPOINT = import.meta.env.SIGNUP_ENDPOINT
 // Version of the consent sentence (copy signup.consent, both languages). Bump it whenever that sentence changes;
 // every version is listed in docs/design-spec.md §4.8.
 export const SIGNUP_CONSENT_VERSION = '2026-11-v1'
+// Version of the privacy policy (copy privacy.*, shown in privacy.updated). Bump it whenever the policy text changes.
+export const PRIVACY_POLICY_VERSION = '2026-11-v1'

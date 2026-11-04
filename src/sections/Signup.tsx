@@ -1,7 +1,7 @@
 import { CircleAlert, MailCheck } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { Outbound, SectionHead } from '../components'
-import { faust, SIGNUP_CONSENT_VERSION, SIGNUP_ENDPOINT } from '../faust'
+import { SectionHead } from '../components'
+import { PRIVACY_URL, SIGNUP_CONSENT_VERSION, SIGNUP_ENDPOINT } from '../faust'
 import { useCopy, useLang } from '../i18n'
 
 // States from design-spec §4.8. 'rejected' is the endpoint's 400; 'failed' is anything else (5xx, network, timeout).
@@ -134,7 +134,10 @@ export function Signup() {
               {/* The privacy link sits after the label, not inside it: a link in a label toggles the box in some browsers. */}
               <p>
                 <label htmlFor="signup-consent">{signup.consent}</label>
-                {faust.privacy && <> <Outbound href={faust.privacy}>{signup.privacy}</Outbound></>}
+                {' '}
+                <a className="link" href={PRIVACY_URL}>
+                  {signup.privacy}
+                </a>
               </p>
             </div>
             {/* Honeypot: off-screen (not display:none, which some bots skip), hidden from assistive tech, out of the tab order. */}

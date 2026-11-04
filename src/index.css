@@ -958,12 +958,25 @@ button.btn-primary:active {
   gap: var(--space-2);
   margin-top: var(--space-3);
 }
+/* Bottom row: copyright left, privacy link right; stacked below 640 (§4.9). */
 .copyright {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
   margin-top: var(--space-7);
   padding-top: var(--space-5);
   border-top: 1px solid var(--night-line);
   color: var(--mist);
-  max-width: none;
+}
+.copyright a {
+  color: var(--paper);
+}
+@media (max-width: 639px) {
+  .copyright {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* ---------- Reduced motion: no transforms or rotations (§1.5) ---------- */
@@ -977,4 +990,60 @@ button.btn-primary:active {
   details[open] .faq-icon {
     transform: none;
   }
+}
+
+/* ---------- §4.9 Privacy policy page ---------- */
+
+/* One measure for everything, left-aligned in the container; long placeholders or URLs can't widen the page. */
+.privacy {
+  max-width: 65ch;
+  overflow-wrap: anywhere;
+}
+.privacy-back {
+  display: inline-block;
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+.privacy-back .link-icon {
+  margin: 0 2px 0 0;
+}
+.privacy .eyebrow {
+  margin-top: var(--space-6);
+}
+/* A legal page, not a hero: the h1 takes the h2 size and the section h2s the h3 size. */
+.privacy h1 {
+  margin-top: var(--space-3);
+  font-size: var(--text-h2);
+  line-height: 1.1;
+}
+.privacy-updated {
+  margin-top: var(--space-3);
+  font-size: var(--text-small);
+}
+.privacy-intro {
+  margin-top: var(--space-5);
+}
+.privacy section {
+  margin-top: var(--space-7);
+}
+.privacy h2 {
+  font-size: var(--text-h3);
+  line-height: 1.25;
+}
+.privacy h2 + * {
+  margin-top: var(--space-3);
+}
+.privacy p + p,
+.privacy p + ul,
+.privacy ul + p {
+  margin-top: var(--space-4);
+}
+.privacy ul {
+  padding-left: 1.4em;
+}
+.privacy li + li {
+  margin-top: var(--space-2);
+}
+.privacy-end {
+  margin-top: var(--space-7);
 }

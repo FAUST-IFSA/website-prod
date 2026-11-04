@@ -89,7 +89,21 @@ Causes already ruled out on the test site: response shape of `findOrCreateExtend
   allow-list; add Turnstile only if junk appears.
 - Publishing our file publishes their whole site. Check pending edits first.
 - Don't rename the `tuner` label or the three custom fields.
-- We need their privacy-policy URL to show the link under the consent box.
+- Our privacy policy page is at `<base>privacy/` (now `/website-prod/privacy/`). The consent box links to it. If
+  Faust has a policy of their own, send the URL and ours will link to it as "see also".
+
+## Faust's obligations under the privacy policy
+
+The policy page (`docs/privacy-policy-spec.md`) promises things only Faust can keep, in their Wix dashboard:
+
+- Delete a contact when the person asks (the policy says "until you unsubscribe or ask us to delete it").
+- Reply to any data-subject request (access, correction, deletion, etc.) within one month, by email.
+- Every marketing email carries an unsubscribe link (Wix's email marketing adds one; don't send from a plain
+  mailbox to the list).
+- Don't rename the `tuner` label or the three custom fields: `tuner-consent-at` and `tuner-consent-version` are
+  the consent proof the policy describes.
+- Tell us which name and IČO go in the policy's "Who is responsible" section (Ing. Richard Mader, IČO 10170367,
+  or Richard Mader, IČO 01577778); the page shows `[brackets]` until they do.
 
 ## Rollback
 

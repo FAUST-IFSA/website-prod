@@ -2,8 +2,9 @@
   "base": "/website-prod/",
   "signupEndpoint": "https://www.fauststudio.net/_functions/tunerSignup",
   "noindex": true,
+  "toolTheme": true,
   "autotuner": {
     "repo": "https://github.com/FAUST-IFSA/autotuner.git",
-    "commit": "32f99949e9eca59b0ef312b5bb3239bb7b875e8c"
+    "commit": "6d09fd3a61f57df4c3a0fb2cb2a2e433210bc574"
   }
 }

@@ -4,6 +4,6 @@
   "noindex": true,
   "autotuner": {
     "repo": "https://github.com/FAUST-IFSA/autotuner.git",
-    "commit": "72b353afde17a5aa0d95027f350400b113efb0f2"
+    "commit": "32f99949e9eca59b0ef312b5bb3239bb7b875e8c"
   }
 }

@@ -24,3 +24,7 @@ dist
 # Office lock files (e.g. ~$oposal.docx)
 ~$*
 *.pem
+
+# Cloudflare Worker (worker/): local state and local secrets
+.wrangler/
+.dev.vars

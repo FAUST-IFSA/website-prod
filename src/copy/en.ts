@@ -1,5 +1,29 @@
 import { faust, PRIVACY_POLICY_VERSION } from '../faust'
 
+// Export email gate, shown over the tool (src/gate.ts, design-spec §4.10 and §5 "Export gate"). A separate export
+// so the gate's bundle carries only these strings. {subscribe} and {skip} are filled with those two labels.
+export const gate = {
+  heading: 'Want to hear from Faust Studio?',
+  lead: 'Leave your email for news from Faust Studio, the Prague recording studio behind this free tuner, or skip this. Your export is the same either way.',
+  emailLabel: 'Email (optional)',
+  // Consent text for source "tool", version 2026-11-v2 (design-spec §4.8 table). Bump the version whenever this changes, in either language.
+  consent:
+    'By choosing “{subscribe}”, you agree that Faust Studio may email you about studio sessions, courses and tuner news, and may see whether you open the emails and which links you click. This is optional, and you can unsubscribe at any time.',
+  // Links to our policy page (PRIVACY_URL), in a new tab so the audio work isn't lost.
+  privacy: 'Privacy policy (opens in a new tab)',
+  subscribe: 'Subscribe and export',
+  sending: 'Subscribing…',
+  skip: 'Export without subscribing',
+  invalidEmail: 'Enter an email address like name@example.com, or choose “{skip}”.',
+  close: 'Close',
+  // No confirmation email is sent (double opt-in is off), so nothing here may say "check your inbox".
+  successTitle: "Thanks, you're on the list.",
+  successBody: 'Faust Studio will email you about studio sessions, courses and tuner news.',
+  failedTitle: "Your subscription didn't go through.",
+  failedBody: "We couldn't save your email, so you're not subscribed. Your export isn't affected.",
+  continue: 'Continue to export',
+}
+
 // Final English copy from docs/design-spec.md §5. Visible copy says "the tuner", never "Auto-Tune" (TODO(name)).
 export const en = {
   meta: {
@@ -17,7 +41,7 @@ export const en = {
     lead: 'See every note you sang, tune them in one click or by hand, and download the result.',
     cta: 'Try it free',
     meta: 'Opens the tuner · WAV, MP3, OGG or FLAC · up to 100 MB',
-    // TODO(email): "No account" must change when the tool adds an email step.
+    // TODO(email): true while the export prompt is optional (design-spec §4.10). "No account" and "Free" must change if an email ever becomes required to export.
     trust: ['Free', 'No account', 'Your audio stays on your device'],
     mobileNote: 'Editing works best on a laptop or desktop.',
     dropMessage: 'Almost: open the tuner, then drop your file there.',
@@ -103,8 +127,11 @@ export const en = {
     heading: 'Questions',
     items: [
       { q: 'Is it free?', a: 'Yes. You can upload, tune and download for free.' },
-      // TODO(email): placeholder until the tool team decides on email. Don't promise "email only at download".
-      { q: 'Do I need an account?', a: 'Not right now. You can use the tuner without signing up.' },
+      // TODO(email): true while the export prompt is optional (design-spec §4.10); rewrite if an email ever becomes required.
+      {
+        q: 'Do I need an account?',
+        a: "No. There is no account and nothing to sign up for. When you export, the tuner asks whether you'd like emails from Faust Studio. You can say no and export just the same.",
+      },
       {
         q: 'Does my audio get uploaded?',
         a: 'No. The tuner runs entirely in your browser, and your audio is never sent to us or anyone else. Your recent files are kept in this browser, on this device, so you can reopen them. You can remove them at any time.',
@@ -129,8 +156,8 @@ export const en = {
     heading: 'Hear from the studio',
     lead: 'Leave your email for news about studio sessions, courses and the tuner. The tuner stays free, with or without it.',
     emailLabel: 'Email',
-    // Consent text, version 2026-11-v1 (design-spec §4.8). Bump SIGNUP_CONSENT_VERSION whenever this changes, in either language.
-    consent: 'Faust Studio may email me about studio sessions, courses and tuner news, and I can unsubscribe at any time.',
+    // Consent text, version 2026-11-v2 (design-spec §4.8 lists every version). Bump SIGNUP_CONSENT_VERSION whenever this changes, in either language.
+    consent: 'Faust Studio may email me about studio sessions, courses and tuner news, and may see whether I open the emails and which links I click. I can unsubscribe at any time.',
     // Links to our policy page (PRIVACY_URL).
     privacy: 'Privacy policy',
     submit: 'Subscribe',
@@ -143,6 +170,7 @@ export const en = {
     successTitle: "Thanks, you're on the list.",
     successBody: 'Faust Studio will email you about studio sessions, courses and tuner news.',
   },
+  gate,
   footer: {
     description: 'Recording studio, residential and creative space near Prague Castle. Since 1991.',
     contactLabel: 'Contact',
@@ -163,7 +191,7 @@ export const en = {
     eyebrow: 'Faust Studio · vocal tuner',
     heading: 'Privacy policy',
     // Bump the date here (both languages) and PRIVACY_POLICY_VERSION together; every version is listed in design-spec §4.9.
-    updated: `Last updated 4 November 2026 · Version ${PRIVACY_POLICY_VERSION}`,
+    updated: `Last updated 12 November 2026 · Version ${PRIVACY_POLICY_VERSION}`,
     intro:
       'This page explains what happens to your data when you use the free vocal tuner and the site around it, and what Faust Studio keeps if you leave your email. The short version: the tuner works entirely in your browser and your audio never leaves your device. We store your email address only if you subscribe, and you can unsubscribe at any time.',
     // Rendered in the "scope" section only when faust.privacy is set.
@@ -178,8 +206,8 @@ export const en = {
         id: 'scope',
         heading: 'What this page covers',
         blocks: [
-          "This policy covers three things: the tuner's landing page, the tuner itself at /tool/, and the email signup form on the landing page.",
-          "It does not cover fauststudio.net, Faust Studio's main site, which is run separately. Sites we link to (Wix, Instagram, Facebook) have their own privacy policies.",
+          "This policy covers the tuner's landing page, the tuner itself at /tool/, and the two places where you can leave your email: the form on the landing page and the prompt that appears when you export from the tuner.",
+          "It does not cover fauststudio.net, Faust Studio's main site, which is run separately. Sites we link to (Ecomail, Instagram, Facebook) have their own privacy policies.",
         ],
       },
       {
@@ -190,6 +218,7 @@ export const en = {
           'The tuner runs entirely in your browser. When you open an audio file, your browser decodes it, finds the notes, applies your changes and creates the download, all on your device. Nothing is uploaded: not the audio, not the file name, not what you changed. There is no account and no login.',
           "So that you can reopen a file later, the tuner keeps the files you have opened in your browser's own storage (IndexedDB) on your device. Only your browser can read them, and they are never sent anywhere.",
           'To remove them, clear this site\'s data in your browser\'s privacy settings (usually under "Cookies and site data" or "Website data"). Do the same if you used the tuner on a shared computer.',
+          'When you export, the tuner asks whether you would like emails from Faust Studio. That is optional. It is the only point at which the tuner can send anything anywhere, and what it sends is your email address, only if you choose to subscribe (see "Email signup" below). Your audio is never part of it.',
         ],
       },
       {
@@ -197,20 +226,32 @@ export const en = {
         heading: 'Email signup',
         blocks: [
           'Leaving your email is optional. The tuner is free and works exactly the same with or without it.',
+          'We ask in two places: the form on the landing page, and a prompt that appears when you export from the tuner. If you close the prompt or export without subscribing, nothing is sent to us, and anything you typed into the email field is discarded.',
           'If you subscribe, Faust Studio stores:',
           [
             'your email address',
             'the language you were using (English or Czech)',
-            'the date and time you ticked the consent box',
-            'the version of the consent sentence you agreed to',
-            'which page you signed up from',
+            'the date and time you subscribed',
+            'the version of the consent text you agreed to',
+            'where you subscribed (the landing page or the tuner)',
           ],
-          "We don't record your IP address or browser details with your signup.",
-          'We use this to email you news about studio sessions, courses and the tuner. The legal basis is your consent (GDPR Article 6(1)(a)), which you give by ticking the box. The box is never pre-ticked.',
-          "Faust Studio's contact list lives in Wix, the platform that hosts fauststudio.net. Wix.com Ltd., based in Israel, processes it on Faust Studio's behalf and stores it in data centres in the United States and Ireland. The EU recognises Israel as having adequate data protection; transfers to the United States are covered by EU standard contractual clauses under Wix's data-processing terms.",
-          { label: "Wix's privacy policy", href: faust.wixPrivacy },
+          "We don't ask for anything else: no name, no account, no password.",
+          // True while double opt-in is off on the Ecomail list (worker/README.md). The with-confirmation wording is in design-spec §5, "Draft for double opt-in".
+          "When you subscribe, your address is added to the list straight away. We don't send a confirmation email.",
+          `We use your address to email you news about studio sessions, courses and the tuner. The legal basis is your consent (GDPR Article 6(1)(a)). You give it by ticking the box on the landing page form, or by choosing "${gate.subscribe}" in the tuner's prompt. Nothing is ticked or chosen for you.`,
+          // Ecomail facts: reports/ecomail-email-gate.md F2. Don't write "EU only" or "Data Privacy Framework" for Ecomail.
+          "Faust Studio's mailing list is kept in Ecomail, an email service run by ECOMAIL.CZ, s.r.o., Prague, Czechia. Ecomail processes the list on Faust Studio's behalf. Its main servers are in Frankfurt, Germany. Ecomail states that the data is kept in the EU and that some of its suppliers may also send data to the United States under EU-approved transfer arrangements.",
+          { label: "Ecomail's terms and data-processing agreement (in Czech)", href: faust.ecomailTerms },
+          // Report F1. It makes no promise that tracking can be switched off, because none is documented.
+          'When Faust Studio emails you, the emails go out through Ecomail, which measures how they are read. Each email contains a small invisible image that tells Ecomail when the email is opened, and its links pass through Ecomail so that clicks are counted. Faust Studio can therefore see whether you opened an email, which links you clicked, and when. When an email is opened or a link is clicked, Ecomail also receives your IP address, an approximate location worked out from it, and details of your device and mail program. This is part of what you agree to when you subscribe.',
+          // TODO(host): PROVISIONAL. The relay's host is not decided (pm, 2026-11-11) and nothing is deployed. This
+          // paragraph and the link under it must be rewritten for whichever host the relay ends up on, before the
+          // signup endpoint goes live. "Stores nothing itself" is a requirement on the relay (worker/README.md).
+          // TODO(verify): the Data Privacy Framework sentence, against Cloudflare's entry on the official list (report F3).
+          'Your signup reaches Ecomail through a small relay that Faust Studio runs on Cloudflare (Cloudflare, Inc., United States). Cloudflare processes the request, including your IP address, on its worldwide network, so it may be handled outside the EU. The relay passes your signup on to Ecomail and stores nothing itself. Transfers to the United States rest on the EU-US Data Privacy Framework.',
+          { label: "Cloudflare's privacy policy", href: faust.cloudflarePrivacy },
           // TODO(verify): Faust must confirm they delete on request (handover note in docs/email-capture-migration.md).
-          'We keep your email until you unsubscribe or ask us to delete it.',
+          'We keep your email address until you unsubscribe or ask us to delete it.',
           "Every email we send has an unsubscribe link. You can also withdraw your consent at any time by writing to the email address under \"Your rights\". Withdrawing stops future emails; it doesn't affect what was sent while your consent was valid.",
         ],
       },
@@ -219,14 +260,18 @@ export const en = {
         heading: 'No cookies, no tracking',
         blocks: [
           "This site sets no cookies, runs no analytics and has no trackers or embedded social media buttons. We don't build profiles of you and make no automated decisions about you.",
-          'Two things are stored in your browser, and only there:',
+          'Three things are stored in your browser, and only there:',
           [
             "your language choice (English or Czech), saved in your browser's local storage only when you click the EN/CS switch",
             'the tuner\'s recent files (see "The tuner" above)',
+            // The gate's keys (src/gate.ts, faust-landing:gate). If what it stores changes, this item changes.
+            "your answer to the tuner's email prompt, saved only when you answer it, so that you aren't asked again: if you subscribed, in local storage; if you chose not to, in session storage, which your browser clears when you close the tab. It records only which answer you gave, never your email address.",
           ],
-          "Both stay on your device and go away when you clear this site's data.",
-          // Verified by the programmer on preview (spec criterion 9): the landing page and /tool/ request nothing off-origin.
-          'Nothing on this site is loaded from other companies. The fonts, scripts and images all come from the site itself, so no third party learns that you visited.',
+          "All of these stay on your device and go away when you clear this site's data.",
+          // Verified by the programmer on preview (gate-spec criterion 8): the landing page, /privacy/ and /tool/ request
+          // nothing off-origin except the one signup POST.
+          'Nothing on this site is loaded from other companies. The fonts, scripts and images all come from the site itself, so no third party learns that you visited. The one time your browser contacts another company from this site is when you subscribe: it then sends your signup to the service described under "Email signup".',
+          'This section is about the site. The emails you get if you subscribe are measured differently; "Email signup" above explains how.',
         ],
       },
       {
@@ -255,7 +300,8 @@ export const en = {
         heading: 'Changes to this policy',
         blocks: [
           `When this policy changes, the date and version number at the top of the page change with it. The current version is ${PRIVACY_POLICY_VERSION}.`,
-          'If you subscribed, the version of the consent sentence you agreed to is stored with your email, so we can always tell which wording you saw.',
+          'Version 2026-11-v2 changed three things: signups now go to Ecomail instead of Wix, the tuner now offers the signup when you export, and this page now explains how the emails record opens and clicks.',
+          'If you subscribed, the version of the consent text you agreed to is stored with your email, so we can always tell which wording you saw.',
         ],
       },
     ],

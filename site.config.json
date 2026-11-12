@@ -1,6 +1,6 @@
 {
   "base": "/website-prod/",
-  "signupEndpoint": "https://www.fauststudio.net/_functions/tunerSignup",
+  "signupEndpoint": "https://signup-worker-not-deployed.invalid/",
   "noindex": true,
   "toolTheme": true,
   "autotuner": {

@@ -1,5 +1,9 @@
 # Email capture: migration to fauststudio.net
 
+> **Superseded, 2026-11-10.** The Wix install will not happen: Ecomail replaces Wix Contacts (see
+> `docs/email-gate-spec.md`). Kept for the record and for "Faust's obligations", which still apply and move to
+> the Ecomail runbook.
+
 Owner: pm · Date: 2026-11-03 · Spec: `docs/email-capture-spec.md` · Code: `wix/`, `src/sections/Signup.tsx`
 
 What this is: the exact steps to move the signup endpoint from our test site

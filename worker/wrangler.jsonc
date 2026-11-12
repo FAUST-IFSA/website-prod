@@ -1,0 +1,17 @@
+// Config for the signup Worker (see README.md). No secrets here: ECOMAIL_API_KEY is set with `wrangler secret put`.
+{
+  "name": "faust-tuner-signup",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  // Off on purpose: Workers Logs would keep our console output and request metadata (privacy policy: the
+  // relay stores nothing). Do not add KV, D1, R2, Analytics Engine or Logpush bindings either.
+  "observability": { "enabled": false },
+  "vars": {
+    // Pages allowed to call the Worker, comma-separated, no trailing slash. Add the new domain here when the
+    // site moves; remove the two localhost entries (dev, preview) for production if you like.
+    "ALLOWED_ORIGINS": "https://faust-ifsa.github.io,http://localhost:5173,http://localhost:4173",
+    // The Ecomail list that receives signups (the number in the list's URL in the Ecomail app).
+    "ECOMAIL_LIST_ID": "1"
+  }
+}

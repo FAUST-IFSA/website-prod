@@ -337,3 +337,198 @@ High on the Ecomail API and custom-form facts (read directly), and on the EDPB r
 pricing, terms and hosting details (correct source, read through a summariser). Medium on the Part B conclusion:
 the rules are clear and point one way, but applying them to this gate is my reasoning, not a regulator's or a
 lawyer's.
+
+---
+
+## Follow-up, 2026-11-10: three checks for privacy policy v2
+
+Requested by pm after the user chose the optional gate (`docs/email-gate-spec.md`). All URLs opened 2026-11-10.
+Same status marks as above. This time Ecomail's terms, privacy policy, data register and tracking-domain article,
+and Cloudflare's DPA, were downloaded and read as raw text, not through a summariser. Still no account and no
+API call.
+
+### F1. Tracking inside Ecomail emails
+
+**Answer: yes, the policy must say the emails contain tracking.** Link clicks are tracked by default and opens are
+measured with a pixel; both are recorded per subscriber. I found no documented switch that turns tracking off
+for a whole account or campaign.
+
+| Question | Finding | Source | Status |
+|---|---|---|---|
+| Clicks tracked by default? | Yes. "Pokud vlastní trackovací doménu neověříte, použijeme ke sledování prokliků výchozí trackovací doménu Ecomailu. O statistiky prokliků tak každopádně nepřijdete." Links are rewritten to pass through a tracking domain (Ecomail's own, or a custom one via CNAME to `spgo.io` / `v2.spgo.io`). | https://support.ecomail.cz/cs/articles/2433141-overeni-trackovaci-domeny (13 Aug 2026) | V |
+| Opens tracked? | Yes. Open events are "tracked via pixel"; campaign reports show open rate and who opened. | https://docs.ecomail.cz/api-reference/webhooks/events.md ; https://intercom.help/ecomail/cs/articles/66824-reporty-odeslanych-kampani (9 Mar 2026) | V / V\* |
+| Switch off per link? | Yes: add `data-msys-clicktrack="0"` to the `<a>` tag. | tracking-domain article, FAQ; https://docs.ecomail.cz/template-language/links.md | V |
+| Switch off per campaign or per account? | Nothing documented. The campaign create/update API has no tracking parameter (only a Google Analytics campaign name). Only the *transactional* API has `open_tracking` / `click_tracking` booleans, and transactional email is not in the free plan. | https://docs.ecomail.cz/api-reference/campaigns/update.md ; https://docs.ecomail.cz/api-reference/transactional/send-message.md | V that none is documented; **CNV** whether the app has a toggle. Look in campaign settings, or ask support@ecomail.cz. |
+| Does it apply to the double opt-in email? | Yes. Ecomail reports `open_rate` and `click_rate` for double opt-in emails, so both are measured there too. (The confirmation click has to be recorded in any case; that is the point of the email.) | https://docs.ecomail.cz/api-reference/transactional/doi-stats.md | V |
+| What is recorded per contact? | A per-subscriber email log with events `send`, `open`, `click` (with the clicked URL), bounces, `unsub`, `spam`, each with a timestamp. The underlying open and click events also carry `ip_address`, `geo_ip` (country, region, city, latitude, longitude) and `user_agent`. Campaign reports show devices, operating systems, mail clients and locations. | https://docs.ecomail.cz/api-reference/subscribers/email-log.md ; webhooks/events.md ; reports article | V / V / V\* |
+| Is the IP kept against the contact inside the app? | The event payload contains it; whether the app stores and shows it per contact is not documented. | — | CNV |
+
+What the policy should say (Inference): emails sent through Ecomail contain a tracking pixel and links that pass
+through a redirect, so Faust can see whether a subscriber opened an email and which links they clicked, with
+time, approximate location and device/mail-client information; this also applies to the confirmation email.
+The consent sentence should mention it briefly too, since it is part of what the person agrees to. Legal note,
+from memory and not re-read today: EDPB Guidelines 2/2023 treat email tracking pixels and tracked links as
+falling under ePrivacy Art. 5(3), i.e. consent-based. That makes disclosure at signup the safe course, and it is
+one more point for the Czech lawyer. If Faust would rather not track, per-link opt-out exists but I could not
+confirm any way to remove the open pixel.
+
+### F2. A9 facts re-read from the raw text
+
+Sources: https://ecomail.cz/obchodni-podminky/ (terms incl. DPA and Annex C), https://ecomail.cz/zasady-zpracovani-osobnich-udaju/,
+https://ecomail.cz/datovy-rejstrik/. All A9 rows below move from V\* to **V**. Two corrections and one nuance.
+
+| A9 fact | Result | Exact wording |
+|---|---|---|
+| Entity and address | Confirmed | "ECOMAIL.CZ, s.r.o., IČO: 027 62 943, se sídlem Na příkopě 388/1, Staré Město, 110 00 Praha 1, zastoupené Ing. Jakubem Stupkou, jednatelem, zapsané v obchodním rejstříku vedeném Městským soudem v Praze sp. zn. C 223183" (terms; the privacy policy writes "110 00 Praha") |
+| Dates | Confirmed | Terms: "Datum účinnosti: 16. června 2026". Privacy policy: "platné od 11. prosince 2025" |
+| Processor role | Confirmed | "Pokud zpracováváme Osobní údaje Příjemců, pak tak činíme Vaším jménem pouze jako zpracovatel, a to v souladu s Vašimi pokyny (tj. pokyny Uživatele)." |
+| DPA at registration | Confirmed | "Zpracovatelská smlouva je uzavřena v okamžiku dokončení registrace za účelem užívání Služby." |
+| Hosting | Confirmed | Register: "Primární servery jsou umístěny v rámci cloudové infrastruktury AWS (region EU‑Central ‑ Frankfurt)." and "Naše data jsou uložena v rámci Evropské unie a mohou se vyskytovat též v rámci Spojených států amerických." Terms: "Exportovatelná data uchováváme a zpracováváme v EU, případně EHP." |
+| Sub-processor list (Annex C) | Confirmed, same nine | AWS EMEA SARL Czech Branch ("Webový servis"), Google Ireland ("AdWords, Google Analytics"), MessageBird B.V. ("CRM pro e‑maily"), Twilio Ireland, CyberPanda.com (SK, "Ověřování e‑mail adres"), Recombee, ZooControl, OpenAI Ireland, Anthropic PBC |
+| New sub-processors | Confirmed | Notice "prostřednictvím e‑mailu nebo přímo v Aplikaci"; objection "nejpozději do 5 dnů" |
+
+**Correction 1: the transfer wording.** The DPA never uses the words "Data Privacy Framework". For AWS, Google and
+MessageBird it says: "Data jsou zachovávána v EU, mohou být zasílána do USA na základě Framework US/EU a nejsou
+… zpracovávány pro vlastní účely." That is evidently the EU-US DPF, but it is my reading, so the policy sentence
+should not put "Data Privacy Framework" in Ecomail's mouth. Other rows: Twilio, "předávají se též do UK na
+základě EU Standard Contractual Clauses (Vykonávací nařízení Komise EU 2021/914) i UK International Data Transfer
+Agreement …, do USA jsou data zasílána na základě Framework US/EU"; ZooControl, "na základě určení Evropské
+Komise o zabezpečených třetích zemích"; OpenAI and Anthropic, "Data jsou mimo EU posílána na základě standardních
+smluvních doložek Rozhodnutí 2021/914 ze dne 4. června 2021". CyberPanda and Recombee: "Data se uchovávájí v EU".
+
+**Correction 2: which document governs our subscribers' data.** The privacy policy's own processor list (Amazon,
+Google, Twilio Inc., SendGrid, MessageBird, …) and its standard-contractual-clauses sentence describe Ecomail as
+a *controller* of its customers' data: "Tyto Zpracovatele využíváme z pozice Správce, to znamená, že
+nezpracovávají údaje, které vložíte do systému v rámci užívání Služby." For the addresses we collect, only the
+DPA and its Annex C apply. Cite those, not the privacy policy, for sub-processors and transfers.
+
+**Nuance:** the register's version line (v1.0, 29 Jan 2026) was not re-read raw and stays V\*.
+
+Policy sentence that matches the text: "stored for us by ECOMAIL.CZ, s.r.o. (Prague), whose main servers are in
+Frankfurt, Germany. Ecomail states that the data is kept in the EU and that some of its suppliers may also send
+data to the United States under EU-approved transfer arrangements."
+
+### F3. Cloudflare (only relevant if a Worker is used)
+
+| Question | Finding | Source | Status |
+|---|---|---|---|
+| Is Cloudflare, Inc. on the DPF list? | Search-engine copies of the official entry show Cloudflare, Inc. as an active participant in the EU-U.S. DPF (original certification 9 Nov 2016), the UK Extension and the Swiss-U.S. DPF, next certification due 15 Sep 2027. One copy reads "Active - Re-certification under Review". The official site is a JavaScript app and returned an empty shell to a direct download, so I did not see the live page. | https://www.dataprivacyframework.gov/participant/5666 | **S** (open the link in a browser to make it V) |
+| Cloudflare's own statement | Its privacy policy says it "complies with the EU-U.S. DPF, the UK Extension to the EU-U.S. DPF, and the Swiss-U.S. DPF", with standard contractual clauses as fallback | https://www.cloudflare.com/privacypolicy/ (effective 4 Nov 2025) | V\* |
+| DPA on transfers | "Customer acknowledges that Cloudflare complies with the Data Privacy Framework and that transfers of Customer Data to Cloudflare made under the Data Privacy Framework shall not be a Restricted Transfer. Cloudflare will notify Customer if its Data Privacy Framework certification lapses…", after which the standard contractual clauses in §6.2 apply | https://www.cloudflare.com/cloudflare-customer-dpa/ (v6.4, effective 3 Apr 2026), §6.4 | V |
+| DPA on request data and IPs | Nothing specific to Workers. The DPA covers "End Users", defined as people who "access or use Customer's domains, networks, websites, application programming interfaces", and lists "Any Personal Data processed in Customer Logs, such as IP addresses" plus "Customer Content" (which is where the email address in the request body would fall). Cloudflare is processor; the contracting entity is Cloudflare, Inc. | same, Annex 1 | V |
+| Where it is processed | No location is promised. The DPA speaks of "geographically-distributed data centers" and gives general authorisation for Cloudflare group companies and data-centre operators as sub-processors. So a visitor's request is normally handled at a nearby location, but EU-only processing is not guaranteed by the DPA. | same, §4.3 and Annex 2 | V (text) / Inference (consequence) |
+| EU-only option | Cloudflare sells regional processing as a paid add-on (Data Localization Suite). Not checked today. | — | CNV (from memory) |
+
+If a Worker is used, the policy line would be: "the form is handled by Cloudflare, Inc. (USA), which processes
+the request, including your IP address, on its network; transfers to the US rest on the EU-US Data Privacy
+Framework." Confirm the DPF entry in a browser before publishing that.
+
+### Follow-up confidence
+
+High on F2 (raw text, quoted). High on F1 that clicks and opens are tracked and recorded per subscriber; medium on
+"cannot be switched off", which is absence of documentation, not a statement by Ecomail. Medium on F3's DPF
+status until someone opens the official entry; high on what the DPA says.
+
+## Spike results, 2026-11-11
+
+Programmer, spec task 1. The six A2 tests, run against list `1` of the Ecomail account `courses`, which is
+**the account Faust will really use, not a throwaway** (pm, 2026-11-11), so the tests were kept read-only: fake
+`example.com` addresses only, no settings changed, nothing created through the API. Double opt-in is **off** on
+the list (see "What double opt-in could change" below). Browser tests: headless Chromium on `npm run preview`, origin
+`http://localhost:4173`, forms and `fetch` calls injected into `/website-prod/tool/`. Header tests: `curl`.
+Read-back: the Ecomail API from the shell, key read from `.env.local` and never printed. Test addresses:
+`spike-01…07-*@example.com` (8 addresses). **None of them was created**, so nothing needed deleting. Checked
+after the last test: the list holds only the one contact that was there before, and its `custom_fields` is
+still `[]` (no field was created).
+
+### Result: the public form URL cannot be used. Recommendation: the Cloudflare Worker (A10).
+
+A POST to the public form URL does not subscribe anyone. It answers `302` to
+`https://courses.ecomailapp.cz/public/robotcheck/1`, an Ecomail-hosted page ("Potvrďte že nejste robot") that
+loads Google reCAPTCHA and re-posts the form itself once Google returns a token. Until that page runs in a
+visible, top-level browser tab, no contact exists. Every way of keeping the visitor on `/tool/` therefore
+fails, and the one way that reaches the page shows the visitor an Ecomail page with Google on it. The
+transport rule in `docs/email-gate-spec.md` needs all six tests to pass and no Ecomail/Google page; tests 1, 2
+and 3 fail outright and test 4 cannot be reached.
+
+| # | What I did | What happened | Evidence |
+|---|---|---|---|
+| 1 | Plain `<form method="post">` from our page, same tab, with `email`, four `custom_fields[...]`, `updateExisting=1`, `?source=spike-plain` | The tab leaves `/tool/` and lands on Ecomail's robot-check page. Visible text: "Přihlásit k odběru novinek / Potvrďte že nejste robot / Tento systém provozuje ecomail.cz". Two `www.google.com` reCAPTCHA frames. In headless Chromium it stayed there for 15 s (no automatic pass). Contact not created. The visitor's unsaved audio work is gone, as A2 predicted. | `302 POST …/public/subscribe/1/<hash>?source=spike-plain -> …/public/robotcheck/1`, then `200 GET …/robotcheck/1`. API: `GET /lists/1/subscriber/spike-03-plain@example.com` → 404 |
+| 2a | The same POST with `target` = a hidden `<iframe>` | Blocked by the browser. Our page stays on `/tool/`, the iframe shows Chrome's error document, nothing is created. | Console: "Refused to display 'https://courses.ecomailapp.cz/' in a frame because it set 'X-Frame-Options' to 'sameorigin'." API: 404 |
+| 2b | The same POST with `target="_blank"` | Our tab stays on `/tool/`. A new tab opens on the same Ecomail robot-check page with the Google frames. Not created within 15 s. | New tab URL `…/public/robotcheck/1`; API: 404 |
+| 3 | `fetch(url, { method: 'POST', mode: 'no-cors', body: URLSearchParams })`, and the same with the default `cors` mode | `no-cors`: an opaque response (`type: "opaque"`, `status: 0`), so the page learns nothing, and the browser follows the redirect to the robot-check HTML, which never runs as a page. Not created. `cors`: throws `Failed to fetch`. | Console: "Access to fetch at '…/public/robotcheck/1' (redirected from '…/public/subscribe/…') … has been blocked by CORS policy". API: 404 for both addresses |
+| 4 | `custom_fields[consent_at]`, `[consent_version]`, `[consent_source]`, `[lang]`, `updateExisting=1`, `?source=` sent in tests 1–3 | **Not testable**: no request got past the robot check, so no contact carries them. What is visible: the robot-check page echoes `email` and `source` back as hidden inputs for its own re-post; whether it also carries `custom_fields[...]` was not checked (I did not solve or bypass the reCAPTCHA). The list's `custom_fields` is still `[]`. | `GET /lists/1` → `"custom_fields":[]` |
+| 5 | Response headers of the endpoint, with `curl` | See the header table below. No CSP `frame-ancestors`; framing is blocked by `X-Frame-Options` instead. `Access-Control-Allow-Origin: *` appears only on the 302, not on the page it redirects to, so a script can never read a result. | `curl -D -` output, 2026-11-11 17:43 UTC |
+| 6 | Logged every request, by top-level document, in tests 1–3 | **Nothing third-party loads into our page.** While `/tool/` was the top document the only off-origin host contacted was `courses.ecomailapp.cz` (the POST itself). Google and the rest load only once the browser is on Ecomail's page: `www.google.com`, `www.gstatic.com`, `fonts.googleapis.com`, `fonts.gstatic.com`, `code.jquery.com`, `maxcdn.bootstrapcdn.com`, `ecomail-assets.s3.eu-west-1.amazonaws.com`. | Playwright request log |
+
+Extra checks:
+
+| What I did | What happened |
+|---|---|
+| Invalid address (`email=not-an-email`) and empty address, by `curl` | `302` back to the form URL itself (the hosted form), not to the robot check. So the endpoint validates the address before the robot check. Nothing created. |
+| Repeat signup (the same new address posted twice) | Both times `302` to the robot check; the address was never created, so duplicate handling could not be observed on this endpoint. |
+| Does a contact record show a stored IP address? | The API's subscriber record (read for the one pre-existing contact) has **no IP field**. Fields present: status, `subscribed_at`, `source`, `custom_fields`, `doi_date_utc`, name and address fields, bounce counters, `last_open`, `last_click`, `last_pageview`, `tags`. That is the API view only; whether the dashboard's contact detail shows an IP still needs a look (see "For the user"). The fields `last_open` / `last_click` confirm F1 (opens and clicks are recorded per contact). |
+| Is the API key anywhere it should not be? | 0 matches in `dist/` and 0 in tracked or untracked source files. The variable has no `VITE_` prefix, so Vite cannot expose it to a page. |
+
+Headers (test 5):
+
+| Request | Status | Headers that matter |
+|---|---|---|
+| `GET` form URL | 200, Ecomail's own hosted form | `x-frame-options: SAMEORIGIN`, `set-cookie: laravel_session=…; secure; httponly; samesite=lax`, no `access-control-*`, no CSP |
+| `OPTIONS` form URL (preflight, `Origin: https://faust-ifsa.github.io`) | 200 | `allow: GET,HEAD,POST`, **no** `access-control-allow-origin` / `-methods` / `-headers`: a preflighted request (JSON body) is refused |
+| `POST` form URL, valid address | 302 → `/public/robotcheck/1` | `access-control-allow-origin: *`, sets a `laravel_session` cookie (the robot-check page reads the pending address from that session) |
+| `GET /public/robotcheck/1` | 200 | `x-frame-options: SAMEORIGIN`, no `access-control-*`, no CSP |
+
+The hosted form and the robot-check page are the same from any origin: nothing in these responses depends on
+`Origin`, so `https://faust-ifsa.github.io` will behave like `localhost:4173`.
+
+### What the findings correct in Part A
+
+- A2 "After submit: the visitor is redirected, to a page set in the list's settings, otherwise to an Ecomail
+  page": true only **after** the robot check. The first redirect is always to `/public/robotcheck/<list>`.
+- A2 "Bot protection … cannot be switched off": confirmed in behaviour. One lead, **not tested** because the
+  task forbids changing list settings: the API's list object has `"settings": { "secured_forms": true }`. If
+  that is the switch for the robot check, turning it off would remove the redirect, but the page still could
+  not read a result (no CORS on the final response) and Ecomail's help says it cannot be disabled. I would not
+  build on it.
+- The hosted form has two honeypot fields of its own (`e-mail`, `firstname`, positioned off-screen).
+
+### What double opt-in could change (it is off on this list)
+
+- Contacts would arrive with status `6` (unconfirmed) instead of `1`, and a confirmation email would go out.
+- The redirect **after** a passed robot check could differ (a "check your inbox" page instead of a "subscribed"
+  page). The redirect **to** the robot check happens before any of that, so the conclusion does not depend on it.
+- Not observed either way: I never got past the robot check.
+
+### Recommendation and what it means for the build
+
+Build the **Cloudflare Worker** (A10, spec "Transport" table, right column): it holds the API key as a secret
+and calls `POST /lists/{id}/subscribe`; the gate and `Signup.tsx` keep today's JSON contract
+(`email, lang, source, consent, consentVersion, website`) and get a real JSON answer, so the gate's failed
+state is truthful. Consequences already listed in the spec: Faust needs a Cloudflare account, Cloudflare is
+named in the privacy policy (F3), bot control is ours (honeypot, origin check, rate limit).
+
+Not yet tested, for task 5 (they need the API to create contacts, which this task did not allow):
+- whether `custom_fields` are auto-created by the API on this account (documented, A3);
+- duplicate handling (`already_subscribed`) and an invalid address through the API;
+- **what `skip_confirmation: false` does on a list whose double opt-in is off.** The docs say it sends a
+  confirmation email and sets status `6`. If it sends, every API test costs one of the free plan's ~200 emails
+  and a test to `example.com` bounces. Use an inbox the user controls for those tests.
+
+### For the user
+
+1. Decide on the Worker (the spec's rule now points to it). It needs a free Cloudflare account; for the demo
+   it can be the user's, later Faust's.
+2. In the Ecomail dashboard, open the one existing contact's detail page and say whether an IP address or a
+   location is shown. The privacy policy's "we don't record your IP address" sentence depends on it, and the
+   API does not show it.
+3. The list's sender address is a Gmail address. A8 says Ecomail does not allow free-mail senders for
+   campaigns and needs a verified domain, which is also what blocks double opt-in. Nothing to do for the spike;
+   it has to be solved before any real signup.
+
+### Spike confidence
+
+High on tests 1, 2, 3, 5 and 6: observed directly, twice each (browser and `curl`), with the API confirming no
+contact was created. Test 4 is unanswered, not failed. One caveat on test 1: headless Chromium is the kind of
+browser reCAPTCHA distrusts, so a real visitor might pass the check without a puzzle; they would still be
+taken to Ecomail's page with Google on it, which the rule excludes.

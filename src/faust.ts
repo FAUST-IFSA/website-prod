@@ -17,8 +17,11 @@ export const faust = {
   // TODO(verify): Faust's own privacy policy URL, asked from Faust (email-capture spec task 0). Our own policy is
   // PRIVACY_URL below; when this is set, our policy links to it as "see also" (docs/privacy-policy-spec.md).
   privacy: '',
-  // External policies our privacy page links to (confirmed by the researcher, reports/privacy-policy-facts.md).
-  wixPrivacy: 'https://www.wix.com/about/privacy',
+  // External pages our privacy page links to (reports/privacy-policy-facts.md, reports/ecomail-email-gate.md F2/F3).
+  // ecomailTerms holds Ecomail's terms and its data-processing agreement, the document that governs our list.
+  ecomailTerms: 'https://ecomail.cz/obchodni-podminky/',
+  // TODO(host): only while the signup relay runs on Cloudflare (worker/); goes with the policy paragraph that uses it.
+  cloudflarePrivacy: 'https://www.cloudflare.com/privacypolicy/',
   uoou: 'https://uoou.gov.cz/',
   instagram: 'https://www.instagram.com/fauststudios/',
   facebook: 'https://www.facebook.com/FaustRecordsStudio/',
@@ -34,8 +37,8 @@ export const PRIVACY_URL = `${import.meta.env.BASE_URL}privacy/`
 
 // Where the signup form POSTs. Value: site.config.json "signupEndpoint", overridable by VITE_SIGNUP_ENDPOINT in dev.
 export const SIGNUP_ENDPOINT = import.meta.env.SIGNUP_ENDPOINT
-// Version of the consent sentence (copy signup.consent, both languages). Bump it whenever that sentence changes;
+// Version of the consent sentences (copy signup.consent and gate.consent, both languages). Bump it whenever either changes;
 // every version is listed in docs/design-spec.md §4.8.
-export const SIGNUP_CONSENT_VERSION = '2026-11-v1'
+export const SIGNUP_CONSENT_VERSION = '2026-11-v2'
 // Version of the privacy policy (copy privacy.*, shown in privacy.updated). Bump it whenever the policy text changes.
-export const PRIVACY_POLICY_VERSION = '2026-11-v1'
+export const PRIVACY_POLICY_VERSION = '2026-11-v2'

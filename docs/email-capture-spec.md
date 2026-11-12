@@ -1,5 +1,9 @@
 # Email capture v1: spec
 
+> **Backend superseded, 2026-11-10.** Ecomail replaces Wix Contacts (user decision), via a Cloudflare Worker.
+> See `docs/email-gate-spec.md`. The landing form described here stays; the Velo endpoint, the Wix tasks (0, 4,
+> 5) and "no double opt-in" below are history. `wix/` is kept until Ecomail is verified end to end.
+
 Owner: pm · Status: in progress (task 1 done 2026-11-03, criterion 10 passed on our test site) · Date: 2026-10-29
 Research behind it: `reports/Wix Core email capture.md` (+ notes in `research_notes/Wix Core CRM email capture/`).
 

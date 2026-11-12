@@ -567,9 +567,32 @@ either language):
 | Version | EN sentence | Since |
 |---|---|---|
 | `2026-11-v1` | Faust Studio may email me about studio sessions, courses and tuner news, and I can unsubscribe at any time. | 2026-11-03 |
+| `2026-11-v2` | Two sentences share the version; `source` says which one the person saw. **Landing form (`source: "landing"`, tick box):** Faust Studio may email me about studio sessions, courses and tuner news, and may see whether I open the emails and which links I click. I can unsubscribe at any time. **Export gate (`source: "tool"`, the Subscribe action, §4.10):** By choosing "Subscribe and export", you agree that Faust Studio may email you about studio sessions, courses and tuner news, and may see whether you open the emails and which links you click. This is optional, and you can unsubscribe at any time. | 2026-11-11 (ships now, no double opt-in) |
+| *draft, not shipped: the version after v2, for when double opt-in is switched on* | Landing: same as v2. Gate: By choosing "Subscribe and export", you agree that Faust Studio may email you about studio sessions, courses and tuner news, and may see whether you open the emails and which links you click. This is optional. We'll first send one email asking you to confirm your address, and you can unsubscribe at any time. | — |
+
+What v2 adds to both sentences: the clause "may see whether I/you open the emails and which links I/you
+click". Ecomail measures opens (a pixel) and clicks (rewritten links) by default, with no documented
+account-wide switch (`reports/ecomail-email-gate.md` F1), so it is part of what the person agrees to and has
+to be said where they agree. The detail (time, IP address, approximate location, device) is in the privacy
+policy, not here. The gate sentence is otherwise new; the landing sentence is otherwise v1. Both languages
+must carry the clause.
+
+**Update 2026-11-11 (Ecomail, no double opt-in for now; user decision, `docs/email-gate-spec.md`).** The form
+now feeds Ecomail, not the Velo endpoint. A subscriber is added to the list straight away as subscribed, and
+**no email is sent at signup**: Ecomail will not send anything, a confirmation email included, until Faust
+has a verified sender domain. Changes to this section, everything else stands:
+- **Success state: unchanged from v1.** "Thanks, you're on the list." and its body are true again and stay.
+  Nothing on the form may say "check your inbox" or imply an email is on its way.
+- **Honesty paragraph above:** "The confirmation does not say 'check your inbox'" stands, for the new reason
+  above. The `TODO(email)` markers are reworded, see §5 "Copy review for the export gate".
+- **When double opt-in is switched on later:** it is a new consent version and a new policy version. The
+  drafted wording is kept: the consent row above, the success text in §5 "Draft for double opt-in".
+- **Consent sentence:** the checkbox label gains the open-and-click clause (table above, §5). It is about one
+  line longer at 375 px; the row's layout already wraps. This is the form's only copy change.
+- No layout, state or colour change. The consent row keeps its tick box.
 
 Send it as `consentVersion`. Suggested home: `SIGNUP_CONSENT_VERSION` in `src/faust.ts`, next to
-`SIGNUP_ENDPOINT`. The Czech sentence (`TODO(cs-review)`) must say the same three things (who, about what,
+`SIGNUP_ENDPOINT`. The Czech sentence (`TODO(cs-review)`) must say the same things (who, about what, that opens and clicks are seen (v2),
 unsubscribe any time) and shares the version.
 
 **Colour pairs used** (all already in §1.1): ink/paper, ink-2/paper (labels, consent), rust/paper (errors,
@@ -667,8 +690,237 @@ policy changes in substance; a typo fix doesn't bump.
 | Version | Last updated | What |
 |---|---|---|
 | `2026-11-v1` | 2026-11-04 | First policy: this page, the tuner at `/tool/`, email signup → Wix. Facts still `TODO(verify)`. |
+| `2026-11-v2` | 2026-11-11 (set to the day it ships) | Ecomail replaces Wix as processor, reached through a Cloudflare relay; **no confirmation email** (double opt-in is off until Faust has a sender domain); the export prompt in the tuner as a second place we ask; the prompt's remembered answer added to browser storage; open and click tracking inside the emails disclosed. v1 text: commit `c74d599`. |
+| *draft, not shipped: the version after v2* | — | Adds the confirmation email when double opt-in is switched on. Wording kept in §5 "Draft for double opt-in". |
 
 **Copy:** §5 "Privacy policy page". Keys: `privacy.*`, `footer.privacy`.
+
+### 4.10 Export gate (2026-11-10)
+
+Requirements: `docs/email-gate-spec.md` (criteria 1–8). Research: `reports/ecomail-email-gate.md` (B5 checklist).
+A modal that appears over the tuner at `/tool/` when the visitor clicks the tool's **Export ▾** button and has
+not answered before. It offers Faust Studio's emails and has two answers of equal weight: subscribe and export,
+or export without subscribing. It is our HTML/CSS/JS injected into the Berlin team's built page; their code is
+not touched. This section covers what the visitor sees. When it appears, what is stored and the transport are
+the pm spec's.
+
+**Look: our cream card, not the tool's dark UI.** Reasons:
+- It says who is asking. The request comes from Faust Studio, not from the tool, and consent has to be informed
+  about who will email. A card in the landing page's cream, ink and rust is recognisably the page the visitor
+  came from.
+- Every text pair we need already passes AA on `--paper` (§1.1). A dark variant would need new input, error and
+  button colours and a fresh contrast table.
+- The tool's look belongs to the Berlin team and can change with any pin bump. Matching it would make our
+  overlay depend on their CSS; a self-contained card does not.
+- Cream on a dimmed dark page has an unmistakable edge with no border and no shadow (§0: no shadows).
+
+Cost: it is a visual jump inside the tool. Accepted: the jump is the point (a different party is speaking), and
+it lasts one decision.
+
+**Fonts: our self-hosted Jost, one family.** The tool page has no fonts of ours, so the gate's CSS declares its
+own `@font-face` for Jost Variable (the same Fontsource `latin` and `latin-ext` woff2 files the landing page
+ships, about 27 + 17 KB, served from our origin; `unicode-range` means English fetches only `latin`).
+`font-display: swap`, fallback stack as `--font-sans`. So the card doesn't reflow on first open, start the load
+early: call `document.fonts.load('600 17px "Jost Variable"')` when the script first sees the Export button.
+Barlow Semi Condensed is **not** loaded: the gate has no eyebrow, and the email label is set in Jost instead
+(below), which saves a second font for one word. No Russo One, no logo image. Nothing comes from another
+company.
+
+**Style isolation (programmer's choice of how).** The tool has global rules that would restyle our controls:
+`button { background: #22252c; border; border-radius: 6px; padding }`, `button:hover`, `button.primary`,
+`button:disabled { opacity: .5 }` and `button:focus-visible, input:focus-visible { outline: 2px solid #7f9cf5 }`.
+None of them may reach the gate, and none of ours may reach the tool. Either a shadow root (with the
+`@font-face` in the document, where it has to be) or a `faust-gate-` class namespace with explicit resets works.
+Our tokens are defined on the gate's root, not on `:root`. The tool does not set a root font size, so `rem` is
+16 px as on the landing page.
+
+**Tokens.** All existing, copied into the gate's stylesheet from `src/index.css`: `--paper`, `--ink`, `--ink-2`,
+`--rust`, `--rust-press`, `--line-strong`, `--radius-sm`, `--radius-md`, the spacing scale, `--font-sans`,
+`--text-h3`, `--text-body`, `--text-small`. One new token:
+
+| Token | Value | Use |
+|---|---|---|
+| `--scrim` | `rgb(21 21 21 / 0.7)` (`--night` at 70%) | The `<dialog>`'s `::backdrop`. No blur. |
+
+**Element.** A native `<dialog>` opened with `showModal()`: top layer (above the tool's `z-index: 20`
+downloaded screen), the page behind inert, focus trapped, Escape handled. `lang` on the dialog is the gate's
+language (the tool's page is `<html lang="en">`, so Czech text needs `lang="cs"` here to be read correctly).
+`aria-labelledby` = the heading, `aria-describedby` = the pitch.
+
+**Layout (one layout at every width).** The card is centred in the viewport both ways.
+
+```
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   ← --scrim over the tool
+ ░░░░  ┌────────────────────────────────────────────────┐  ░░░░
+ ░░░░  │ Want to hear from Faust Studio?            [×] │  ░░░░   ← h2, --text-h3, 600
+ ░░░░  │ Leave your email for news from Faust Studio,   │  ░░░░   ← pitch, --text-body, --ink-2
+ ░░░░  │ the Prague recording studio behind this free … │  ░░░░
+ ░░░░  │                                                │  ░░░░
+ ░░░░  │ Email (optional)                               │  ░░░░   ← label, Jost 600, --text-small
+ ░░░░  │ ┌────────────────────────────────────────────┐ │  ░░░░
+ ░░░░  │ │                                            │ │  ░░░░   ← 52 px input, as §4.8
+ ░░░░  │ └────────────────────────────────────────────┘ │  ░░░░
+ ░░░░  │ By choosing "Subscribe and export", you agree  │  ░░░░   ← consent, --text-small, --ink-2
+ ░░░░  │ that Faust Studio may email you about … Privacy│  ░░░░
+ ░░░░  │ policy (opens in a new tab)                    │  ░░░░
+ ░░░░  │ ┌────────────────────────────────────────────┐ │  ░░░░
+ ░░░░  │ │           Subscribe and export             │ │  ░░░░   ← --rust / --paper
+ ░░░░  │ └────────────────────────────────────────────┘ │  ░░░░
+ ░░░░  │ ┌────────────────────────────────────────────┐ │  ░░░░
+ ░░░░  │ │        Export without subscribing          │ │  ░░░░   ← --ink / --paper
+ ░░░░  │ └────────────────────────────────────────────┘ │  ░░░░
+ ░░░░  └────────────────────────────────────────────────┘  ░░░░
+```
+
+- **Card:** `--paper` background, `--ink` text, `--radius-md`, no border, no shadow.
+  `width: min(560px, 100vw - 32px)`, `max-height: calc(100dvh - 32px)`, `overflow-y: auto` (so 200% text or a
+  phone keyboard scrolls inside the card, never the page sideways). Padding 32; below 640 px, 20.
+- **At 1280:** a 560 px card in the middle of the tool. **At 375:** 343 px wide, 16 px from each edge, same
+  order, same stacked buttons. Nothing has a fixed width and every label may wrap.
+- **Both answers stay in view (added after the build review, 2026-11-10).** On a 375 × 667 phone the card is
+  taller than the screen (689 px of content in EN, 740 in CS, against 635 available), and the first build cut
+  the Skip button off at the card's edge while Subscribe was fully visible; in Czech both were cut. That breaks
+  equal visibility exactly where it matters. So the two buttons sit in one wrapper that is
+  `position: sticky; bottom: 0` inside the scrolling card: `--paper` background, 16 px padding above the
+  Subscribe button, the card's own padding below the Skip button (so the pair ends where the card ends), a
+  1 px `--line-strong` top border only while content is scrolled underneath it (a permanent border is fine if
+  detecting that costs code). The text above scrolls behind the pair. Give the card `scroll-padding-bottom`
+  equal to the pair's height so a focused field or link is never hidden under it. Apply the sticky rule only
+  under `@media (min-height: 560px)`: on a shorter viewport (browser zoom at 200%, or a landscape phone) the
+  pair would eat most of the card, and plain scrolling as built is right there. The result views are short
+  and need none of this.
+  - **Text-only 200% on a small phone (decided 2026-11-11): leave as built.** With text scaled to 200% at
+    375 × 667 the heading and pitch alone are taller than the card, and the pair cannot stick above the top of
+    its own container (the form). So when the gate opens neither button is visible; once the form scrolls into
+    view the pair pins and both appear together, and stay. That meets the requirement, which is that the two
+    answers are never *unequally* visible. The alternative, pinning the pair from the start by moving the
+    heading and pitch into the form, would cover 38% of the card with buttons while someone reading at double
+    size works through the text, and would show the two answers before the question they answer. Not worth it.
+  - **The whole consent sentence is on screen before the buttons (2026-11-11).** With the first build's text,
+    the last lines of the consent sentence and the privacy link started out under the pair at 375 × 667. The
+    shorter v2 consent sentence (no confirmation clause) plus a pitch trimmed from five lines to four fixes
+    that in English: measured in the browser with the §5 strings, the privacy link ends at y 493 and the pair
+    starts at 499, so nothing a person agrees to is hidden when the gate opens. 3 px of empty bottom margin
+    still scroll, which shows nothing new. **Not measured for Czech**, whose strings run longer; if the Czech
+    consent sentence still ends under the pair, shorten the Czech pitch first, never the consent sentence.
+    The invalid-email error adds lines and makes the card scroll again, which is fine: the error and the
+    field are above the pair.
+  - **Checked on the build, 2026-11-11** (headless Chromium, 375 × 667, EN and CS): Subscribe at y 515–567,
+    Skip at 579–631, card ends at 651, in both languages, at the top and at the end of the scroll.
+- **Vertical rhythm:** heading (with `padding-right: 44px` to clear the close button) → 8 → pitch → 24 → label
+  → 8 → input → (8 → field error, when shown) → 16 → consent → 24 → Subscribe button → 12 → Skip button.
+- **Heading:** `<h2>`, `--text-h3` (22 / 1.25 / 600). **Pitch:** one `<p>`, `--text-body`, `--ink-2`.
+- **Label:** a real `<label>`, Jost 600 at `--text-small`, `--ink-2`, sentence case (not the uppercase Barlow
+  `.label` of §4.8; see Fonts). It reads "Email (optional)". No placeholder.
+- **Input:** as §4.8 item 2 (`type="email"`, `autocomplete="email"`, `inputmode="email"`,
+  `spellcheck="false"`, 52 px, 2 px `--line-strong`, `--radius-sm`, hover border `--ink`, invalid border
+  `--rust`). **Not** `required`: an empty field is a valid way to leave. `aria-describedby` = the consent
+  sentence's id, plus the error's id while it is shown.
+- **Consent:** one `<p>` in `--text-small`, `--ink-2`, with the privacy link at its end, inline. **No tick
+  box** (see below).
+- **Privacy link:** plain `.link` to `PRIVACY_URL` with `target="_blank"` and `rel="noopener"`. This is the one
+  new-tab link on the site: leaving `/tool/` in the same tab would destroy the visitor's unsaved audio work.
+  The link text itself says "(opens in a new tab)", visibly, so nobody is surprised and screen readers hear it.
+  No ↗ icon (§3.1: that means another site).
+- **Honeypot:** as §4.8 item 5, if the transport from spec task 1 uses one.
+- **Close button:** `<button type="button">`, 44 × 44, `position: absolute; top: 8px; right: 8px`, Lucide `X`
+  24 (inline SVG, `aria-hidden`) in `--ink-2`, transparent background, hover `--ink`; `aria-label` = `gate.close`.
+  It is **last in the DOM** (so Tab reaches the two answers first) and drawn top-right.
+
+**The two actions and their weight.** Both are full-width `<button>`s, stacked, identical in size (min-height
+52, padding 8 / 28), type (Jost 600 17 px, `line-height: 1.2`, `white-space: normal`, centred) and radius.
+They differ only in fill, and both fills are solid and high-contrast:
+
+| Action | Fill / text | Hover | Active |
+|---|---|---|---|
+| **Subscribe and export** (`type="submit"`) | `--rust` / `--paper` (5.3) | `--rust-press` (7.1) | `translateY(1px)` |
+| **Export without subscribing** (`type="button"`) | `--ink` / `--paper` (17.9) | `--ink-2` (10.3) | `translateY(1px)` |
+
+- Why two solid buttons and not primary + outline: an outline button next to a filled one reads as the lesser
+  choice, and the spec's legal point is that declining must not be the lesser choice. Ink on paper is the
+  strongest pair we have, so the skip is never the faint one. Why stacked at every width: side by side in a
+  560 px card each gets 240 px, and "Export without subscribing" (longer in Czech) would wrap while "Subscribe
+  and export" would not, which makes them unequal again.
+- Subscribe is first because it belongs to the field and the consent sentence directly above it.
+- **No inactive look.** Unlike §4.8, the Subscribe button always looks active. A greyed-out button beside a
+  solid one would tilt the weight the other way, and pressing it with an empty or invalid email simply shows
+  the field error. Neither button ever uses the `disabled` attribute (`aria-disabled` while submitting).
+- No transforms under `prefers-reduced-motion: reduce`.
+
+**Consent: the labelled action, not a tick box** (report B5 allows either). The gate already asks one
+either/or question with two explicit buttons. A box would add a third state (email typed, box unticked,
+Subscribe pressed) that needs its own error and helps nobody. So the sentence names the button, and pressing
+that button is the opt-in. Nothing is pre-selected, Enter in the email field submits (the same act as pressing
+Subscribe), and nothing else is bundled into the action. The landing form keeps its tick box (§4.8): it has one
+button, and it is already built and tested. The sentence takes the button's label by interpolation
+(`{subscribe}`), so the two cannot drift apart.
+
+**Focus and keyboard.**
+- **Initial focus:** the heading (`tabindex="-1"`, `outline: none` on it). Not the email field: focusing it
+  favours one answer, and on a phone it opens the keyboard over the Skip button. A screen reader then reads
+  the heading and the pitch (`aria-describedby`) first.
+- **Tab order:** email → privacy link → Subscribe and export → Export without subscribing → Close. Focus is
+  trapped (native `showModal()`).
+- **Focus ring:** ours, `3px solid var(--ink)`, offset 3, on every control in the card (on the ink button the
+  3 px paper gap keeps the ring visible). The tool's blue ring must not show.
+- **Escape and Close:** close the gate and do **not** export. Nothing is stored, nothing is sent, a typed email
+  is discarded, and the next Export click shows the gate again. Both are ignored while submitting (at most 10 s).
+- **Clicking the scrim:** does nothing. A stray click must not throw away a typed email, and Close and Escape
+  are right there.
+- **On close**, focus returns to the tool's Export button. After an answer the script then clicks that button,
+  so the tool's own menu opens with focus where the tool expects it.
+- **Keys stay in the dialog.** The tool listens for shortcuts on `window` (Space = play, Cmd/Ctrl-Z, Delete,
+  Escape), so while the gate is open every `keydown` is stopped from reaching the tool. Consequence: any key
+  handling the gate needs must be attached inside the dialog. The gate needs none of its own: Tab, Shift-Tab,
+  Enter in the email field (form submit), Space/Enter on buttons and Escape (the dialog's `cancel` event) are
+  all native. Typing a space or pressing Delete in the email field must edit the field and nothing else.
+- **Motion:** the card and scrim fade in over 150 ms (opacity only). None under reduced motion.
+
+**States.** One visually-hidden `<p role="status">` lives in the dialog from the moment it opens (`.sr-only`,
+§4.8); only it announces.
+
+| State | What the visitor sees | Buttons | Announcer |
+|---|---|---|---|
+| Idle | The card as drawn. No messages. | Both active | (empty) |
+| Invalid email (Subscribe pressed, or Enter, with an empty or malformed address) | Field error 8 px under the input: Lucide `CircleAlert` 20 + `gate.invalidEmail` in `--text-small` `--rust`. Border `--rust`, `aria-invalid="true"`, focus moves to the input (the error is read through `aria-describedby`). Clears as soon as the value is valid. Validation runs **only** on a Subscribe attempt, never on blur: blur is what happens when someone reaches for Skip. | Both active | (none; the field error is read on focus) |
+| Submitting | Fields unchanged, no spinner, `<form aria-busy="true">`. Further presses, Close and Escape are ignored. Ends on a response or after 10 s. | Subscribe: label `gate.sending`, `--rust-press` / `--paper`, `aria-disabled`. Skip: `aria-disabled`, unchanged look (it is 10 s at most, and greying it would flicker on a fast response) | Subscribing… |
+| Subscribed (result) | The form is replaced, inside the same card, by: Lucide `MailCheck` 24 in `--rust` beside `gate.successTitle` (`<h2>`, `--text-h3`), under it `gate.successBody` (`--text-body`, `--ink-2`), then 24 px and one full-width `--ink` button, `gate.continue`. The dialog's `aria-labelledby` now points at this heading; it has `tabindex="-1"` and takes focus. | Continue to export | `gate.successTitle` |
+| Signup failed, export continues (any error, or 10 s with no answer) | Same result layout: Lucide `CircleAlert` 24 in `--rust` beside `gate.failedTitle`, `gate.failedBody`, the same Continue button. No retry: the export must not wait on a second attempt, and the visitor is asked again on a later visit. | Continue to export | `gate.failedTitle` |
+| Closed | The dialog is removed and the tool is exactly as before. | — | — |
+
+- **What each exit does:** *Export without subscribing* and *Continue to export* close the gate and open the
+  tool's export menu. *Close* and *Escape* close it without opening the menu; on a result view the answer is
+  already recorded, so the next Export click goes straight to the menu.
+- **What is remembered** (pm spec, repeated so the states are complete): subscribed → `localStorage`, never
+  asked again. Skipped, or signup failed → `sessionStorage`, not asked again in this session. Closed without
+  an answer → nothing. Never the email.
+- **Why a result view, when the pm brief has the gate close straight after either action:** a subscriber
+  should see that the subscription went through (and, once double opt-in is on, be told to confirm by
+  email), and a failed signup must be reported. The only
+  other place for either message is a floating notice over an interface we don't control, which nobody is
+  focused on and which would cover the tool at 375 px. One extra press, for subscribers only, buys a message
+  that is certain to be seen and read out. Skipping stays one press. (Flagged to pm.)
+- **Button wording, "export" not "download":** the visitor has just pressed the tool's **Export ▾**, and what
+  opens next is a menu reading "Export as WAV / MP3", not a download. The labels promise what happens.
+  (Flagged to pm; the tool's label was read at `72b353a`. If the tool renames the button, update `gate.*`.)
+- **If spec task 1 picks Ecomail's public form URL**, the page cannot read the response, so the failed state is
+  reachable only by a network error or the timeout. `gate.successBody` is worded to stay true then: it says
+  to look for the email, not that one was sent.
+
+**Honesty.** No string says or implies the email is needed to export: the heading is a question, the pitch
+says the export is the same either way, the label says "(optional)", and the consent sentence says "This is
+optional". **Since 2026-11-11 there is no double opt-in:** a subscriber is on the list at once and no email is
+sent at signup, so the success text says "you're on the list" and nothing in the gate may mention a
+confirmation email, an inbox or anything "on its way". It stays true for a repeat signup (the endpoint treats
+a repeat as success). When double opt-in is switched on, the drafted texts in §5 "Draft for double opt-in"
+replace these, and the confirmation email's sender name in Ecomail must then read "Faust Studio" (pm runbook).
+
+**Colour pairs used** (all in §1.1, or the same two colours reversed): ink/paper, ink-2/paper (pitch, label,
+consent, close icon), rust/paper (error text, icons), paper/rust and paper/rust-press (Subscribe), paper/ink
+17.9 and paper/ink-2 10.3 (Skip and Continue, and hover), line-strong/paper (input border, 3.9 non-text). No
+text sits on the scrim.
+
+**Copy:** §5 "Export gate". Keys: `gate.*` (the separate `gate` export in `copy/en.ts` / `cs.ts`).
 
 
 ---
@@ -699,7 +951,8 @@ word appears only in the meta description, for search.
 - Box button: Try it free
 - Box meta: Opens the tuner · WAV, MP3, OGG or FLAC · up to 100 MB
 - Trust line: Free · No account · Your audio stays on your device
-  `TODO(email)`: "No account" must change when the tool adds an email step.
+  `TODO(email)`: true while the export prompt is optional (§4.10). "No account" and "Free" must change if an
+  email ever becomes required to export. (Reworded 2026-11-10; the visible text is unchanged.)
 - Mobile note: Editing works best on a laptop or desktop.
 - Drop message: Almost: open the tuner, then drop your file there.
 
@@ -774,8 +1027,10 @@ word appears only in the meta description, for search.
 
 **FAQ** (H2: Questions)
 1. **Is it free?** Yes. You can upload, tune and download for free.
-2. **Do I need an account?** Not right now. You can use the tuner without signing up.
-   `TODO(email)`: placeholder until the tool team decides on email. Don't promise "email only at download".
+2. **Do I need an account?** No. There is no account and nothing to sign up for. When you export, the tuner
+   asks whether you'd like emails from Faust Studio. You can say no and export just the same.
+   `TODO(email)`: true while the export prompt is optional (§4.10); rewrite if an email ever becomes required.
+   (2026-11-10; was "Not right now. You can use the tuner without signing up.", a placeholder.)
 3. **Does my audio get uploaded?** No. The tuner runs entirely in your browser, and your audio is never sent
    to us or anyone else. Your recent files are kept in this browser, on this device, so you can reopen them.
    You can remove them at any time.
@@ -791,8 +1046,11 @@ word appears only in the meta description, for search.
 - Lead: Leave your email for news about studio sessions, courses and the tuner. The tuner stays free, with
   or without it.
 - Email label: Email
-- Consent (checkbox label, version `2026-11-v1`): Faust Studio may email me about studio sessions, courses
-  and tuner news, and I can unsubscribe at any time.
+- Consent (checkbox label, version `2026-11-v2`, 2026-11-10): Faust Studio may email me about studio
+  sessions, courses and tuner news, and may see whether I open the emails and which links I click. I can
+  unsubscribe at any time.
+  (v1, until 2026-11-10: "Faust Studio may email me about studio sessions, courses and tuner news, and I can
+  unsubscribe at any time." Kept in the §4.8 table.)
 - Privacy link: Privacy policy → `PRIVACY_URL`, our own page (§4.9). Plain link, no ↗, same tab, always
   rendered (2026-11-04; was `faust.privacy`, not rendered until set).
 - Button: Subscribe · while sending: Sending… · after an error: Try again
@@ -800,9 +1058,82 @@ word appears only in the meta description, for search.
 - Invalid email: Enter an email address like name@example.com.
 - Error (400): That email address wasn't accepted. Check it and try again.
 - Error (other): Something went wrong and your email wasn't saved. Please try again.
-- Success title: Thanks, you're on the list.
-- Success body: Faust Studio will email you about studio sessions, courses and tuner news.
+- Success title (`signup.successTitle`): Thanks, you're on the list.
+- Success body (`signup.successBody`): Faust Studio will email you about studio sessions, courses and tuner
+  news.
+  (Both unchanged from v1, 2026-11-11: with no double opt-in they are true as written, and no email is sent
+  at signup, so nothing here may say "check your inbox". The with-confirmation wording is under "Draft for
+  double opt-in" below.)
 - Honeypot: no visible text; `name="website"`, `aria-hidden`.
+
+**Export gate** (§4.10; keys `gate.*`, the separate `gate` export; written 2026-11-10)
+- Heading (`gate.heading`): Want to hear from Faust Studio?
+- Pitch (`gate.lead`, trimmed 2026-11-11): Leave your email for news from Faust Studio, the Prague recording
+  studio behind this free tuner, or skip this. Your export is the same either way.
+  (Was: "This free tuner is made by Faust Studio, a recording studio in Prague. Leave your email for news
+  about studio sessions, courses and the tuner, or skip this. Your export is the same either way." One line
+  shorter at 375 px, so the whole consent sentence shows above the pinned buttons, §4.10. The topics it
+  dropped are in the consent sentence directly below.)
+- Email label (`gate.emailLabel`): Email (optional)
+- Consent (`gate.consent`, version `2026-11-v2`, §4.8 table): By choosing "{subscribe}", you agree that Faust
+  Studio may email you about studio sessions, courses and tuner news, and may see whether you open the emails
+  and which links you click. This is optional, and you can unsubscribe at any time.
+  (2026-11-11: the confirmation clause is out, because no email is sent at signup. `{subscribe}` = `gate.subscribe`, interpolated. Use typographic quotes: “ ” in EN, „ “ in CS.)
+- Privacy link (`gate.privacy`): Privacy policy (opens in a new tab) → `PRIVACY_URL`, `target="_blank"`
+- Subscribe button (`gate.subscribe`): Subscribe and export
+- While submitting (`gate.sending`, button label and announcer): Subscribing…
+- Skip button (`gate.skip`): Export without subscribing
+- Invalid email (`gate.invalidEmail`): Enter an email address like name@example.com, or choose "{skip}".
+  (`{skip}` = `gate.skip`.)
+- Close button name (`gate.close`): Close
+- Success title (`gate.successTitle`, 2026-11-11): Thanks, you're on the list.
+- Success body (`gate.successBody`, 2026-11-11): Faust Studio will email you about studio sessions, courses
+  and tuner news.
+  (The same two strings as the landing form's success state.)
+- Failed title (`gate.failedTitle`): Your subscription didn't go through.
+- Failed body (`gate.failedBody`): We couldn't save your email, so you're not subscribed. Your export isn't
+  affected.
+- Result button (`gate.continue`): Continue to export
+- The programmer's placeholder key `gate.failed` splits into `failedTitle` / `failedBody`. Every other
+  placeholder key keeps its name.
+
+**Draft for double opt-in** (NOT shipped; kept for the day Faust has a verified sender domain and the list's
+double opt-in is switched on. Using any of it means a new consent version and a new policy version.)
+- Gate consent: By choosing "{subscribe}", you agree that Faust Studio may email you about studio sessions,
+  courses and tuner news, and may see whether you open the emails and which links you click. This is
+  optional. We'll first send one email asking you to confirm your address, and you can unsubscribe at any
+  time.
+- Success title (gate and landing): One more step: confirm your email.
+- Success body (gate and landing): Look for an email from Faust Studio and click the link in it. You won't
+  get any other emails until you do. If you confirmed earlier, you're already on the list.
+- Policy, section 5, after the "We don't ask for anything else" line: After you subscribe, you get one email
+  asking you to confirm your address. Until you click the link in it, you are not on the list and you receive
+  nothing else from us.
+- Policy, section 5, tracking paragraph: "Each email, including the confirmation email, contains …".
+- Policy, section 5, retention: We keep your email address until you unsubscribe or ask us to delete it. That
+  includes an address that was never confirmed: it receives no emails, and you can ask us to delete it like
+  any other.
+- Policy, section 8: add "you now get an email to confirm your address before anything else is sent".
+- Check then: the confirmation email's sender name reads "Faust Studio"; whether unconfirmed addresses are
+  purged after a fixed time (pm asked the user, 2026-11-10); the pinned-buttons fit at 375 px with the longer
+  consent sentence (§4.10).
+
+**Copy review for the export gate** (2026-11-10, gate-spec criterion 13). Everything on the landing page that
+touches "free", "account", "sign up" or email, read against an optional prompt at Export:
+
+| String | Verdict |
+|---|---|
+| Meta description: "No account, nothing uploaded." | Stays. Both still true. |
+| Hero trust line: Free · No account · Your audio stays on your device | Stays. The `TODO(email)` comment is reworded (Hero, above). |
+| How it works 04: "Export a full-quality 24-bit WAV, or a smaller 192 kbps MP3." | Stays. It doesn't mention the prompt and doesn't need to: nothing in it becomes untrue, and FAQ 2 covers it. |
+| FAQ 1: "Yes. You can upload, tune and download for free." | Stays. |
+| FAQ 2: "Not right now. You can use the tuner without signing up." | **New wording** (FAQ, above). "Not right now" was a placeholder, and a visitor who meets an email prompt after reading "without signing up" deserves to have been told. |
+| FAQ 3: "your audio is never sent to us or anyone else" | Stays. The only thing the prompt can send is an email address, and only on Subscribe. |
+| Signup lead: "The tuner stays free, with or without it." | Stays. |
+| Signup consent sentence | **New wording**: gains the open-and-click clause; version `2026-11-v2` (§4.8). |
+| Signup success title and body | Stay as v1 (2026-11-11: no confirmation email is sent, so "you're on the list" is true). |
+| Signup errors, hint, button labels | Stay. |
+| Privacy policy | **v2** (below). |
 
 **Footer**
 - Description: Recording studio, residential and creative space near Prague Castle. Since 1991.
@@ -819,7 +1150,23 @@ word appears only in the meta description, for search.
 - Copyright: © 2026 Faust Studio. `TODO(verify)`: legal owner name. fauststudio.net shows
   "© 2025 by Richard Mader jr."
 
-**Privacy policy page** (§4.9; keys `privacy.*`; written 2026-11-04, version `2026-11-v1`)
+**Privacy policy page** (§4.9; keys `privacy.*`; written 2026-11-04; **now version `2026-11-v2`, 2026-11-11**)
+
+**v2 in one paragraph** (`docs/email-gate-spec.md` → "Privacy policy v2"). Changed: the updated line, section
+2 (scope), section 3 (one paragraph added), section 5 (rewritten), section 6 (storage list and the last
+paragraph), section 8 (version + what changed). Unchanged: intro, meta, sections 7, and the two suspended
+sections (1 and 4). The text below **is** v2; v1 is in git (`c74d599`). The Ecomail facts come from
+`reports/ecomail-email-gate.md`, "Follow-up, 2026-11-10" (F1 tracking, F2 the processor facts re-read from
+Ecomail's terms, DPA and data register as raw text), so the Ecomail paragraphs carry no `TODO(verify)`. Two
+rules from that follow-up: the transfer sentence does not use the name "Data Privacy Framework" (Ecomail's DPA
+says "Framework US/EU") and does not say "EU only" (the register says data may also be present in the US);
+and for our subscribers the governing document is the DPA with its Annex C, not Ecomail's privacy policy. **Revised 2026-11-11 (user decision: collect now, without double opt-in).** v2 as it ships promises **no
+confirmation email**: a subscriber is on the list at once and nothing is sent at signup. The with-confirmation
+sentences are kept under "Draft for double opt-in" above, for a later version. The pending block in section 5
+is resolved: the spike chose the Cloudflare Worker, so that paragraph is final apart from one `TODO(verify)`.
+"On Faust Studio's behalf" and "Faust Studio runs" are literally true only when the Ecomail and Cloudflare
+accounts are Faust's; pm tracks which they are (the spike notes the Ecomail account is the one Faust will
+use).
 
 Plain language, second person, short paragraphs, no legalese. Nothing here claims more than the site does
 today (spec criterion 7): GitHub does log IPs, there is no confirmation email, no encryption claim. Bracketed
@@ -839,7 +1186,8 @@ the section `id`; a block is a paragraph unless marked *list* or *link*.
 - Back link (`privacy.back`, top and bottom): Back to the tuner page
 - Eyebrow (`privacy.eyebrow`): Faust Studio · vocal tuner
 - H1 (`privacy.heading`): Privacy policy
-- Updated line (`privacy.updated`): Last updated 4 November 2026 · Version 2026-11-v1
+- Updated line (`privacy.updated`): Last updated 11 November 2026 · Version 2026-11-v2 (use the date v2
+  actually ships)
 - Intro (`privacy.intro`): This page explains what happens to your data when you use the free vocal tuner
   and the site around it, and what Faust Studio keeps if you leave your email. The short version: the tuner works
   entirely in your browser and your audio never leaves your device. We store your email address only if you
@@ -859,10 +1207,11 @@ the section `id`; a block is a paragraph unless marked *list* or *link*.
   applies, researcher-confirmed.)
 
 **2 · `scope` · What this page covers**
-- This policy covers three things: the tuner's landing page, the tuner itself at /tool/, and the email signup
-  form on the landing page.
+- This policy covers the tuner's landing page, the tuner itself at /tool/, and the two places where you can
+  leave your email: the form on the landing page and the prompt that appears when you export from the tuner.
 - It does not cover fauststudio.net, Faust Studio's main site, which is run separately. Sites we link to
-  (Wix, Instagram, Facebook) have their own privacy policies.
+  (Ecomail, Instagram, Facebook) have their own privacy policies.
+- (v2: the prompt added; "Wix" → "Ecomail", because the Wix policy link is gone from section 5.)
 - (GitHub dropped from the list 2026-11-04 with the hosting section: the page no longer links to GitHub.)
 - *link (Outbound, rendered only when `faust.privacy` is set):* See also: Faust Studio's privacy policy
 
@@ -874,6 +1223,11 @@ the section `id`; a block is a paragraph unless marked *list* or *link*.
   (IndexedDB) on your device. Only your browser can read them, and they are never sent anywhere.
 - To remove them, clear this site's data in your browser's privacy settings (usually under "Cookies and site
   data" or "Website data"). Do the same if you used the tuner on a shared computer.
+- When you export, the tuner asks whether you would like emails from Faust Studio. That is optional. It is the
+  only point at which the tuner can send anything anywhere, and what it sends is your email address, only if
+  you choose to subscribe (see "Email signup" below). Your audio is never part of it.
+- (v2: the paragraph above is new. Nothing in this section said the tuner never asks for an email, so nothing
+  was removed; "There is no account and no login" stays true.)
 - (The recent-files and nothing-uploaded sentences were checked at autotuner `e255279`, `storage/recent.ts`.
   `site.config.json` now pins `72b353a`; the programmer re-confirms both at that commit during the criterion-9
   run. Hold the text unless they report a difference.)
@@ -892,22 +1246,60 @@ the `sections` array; the id stays reserved. Its last paragraph ("Nothing on thi
 
 **5 · `signup` · Email signup**
 - Leaving your email is optional. The tuner is free and works exactly the same with or without it.
+- We ask in two places: the form on the landing page, and a prompt that appears when you export from the
+  tuner. If you close the prompt or export without subscribing, nothing is sent to us, and anything you typed
+  into the email field is discarded.
 - If you subscribe, Faust Studio stores:
 - *list:*
   - your email address
   - the language you were using (English or Czech)
-  - the date and time you ticked the consent box
-  - the version of the consent sentence you agreed to
-  - which page you signed up from
-- We don't record your IP address or browser details with your signup.
-- We use this to email you news about studio sessions, courses and the tuner. The legal basis is your consent
-  (GDPR Article 6(1)(a)), which you give by ticking the box. The box is never pre-ticked.
-- Faust Studio's contact list lives in Wix, the platform that hosts fauststudio.net. Wix.com Ltd., based in
-  Israel, processes it on Faust Studio's behalf and stores it in data centres in the United States and Ireland.
-  The EU recognises Israel as having adequate data protection; transfers to the United States are covered by
-  EU standard contractual clauses under Wix's data-processing terms.
-- *link (Outbound):* Wix's privacy policy → `faust.wixPrivacy`
-- We keep your email until you unsubscribe or ask us to delete it.
+  - the date and time you subscribed
+  - the version of the consent text you agreed to
+  - where you subscribed (the landing page or the tuner)
+- We don't ask for anything else: no name, no account, no password.
+- When you subscribe, your address is added to the list straight away. We don't send a confirmation email.
+- (2026-11-11: replaces the confirmation-email paragraph, which is kept under "Draft for double opt-in".
+  It says plainly that nothing is sent at signup, so nobody waits for an email that isn't coming.)
+- We use your address to email you news about studio sessions, courses and the tuner. The legal basis is your
+  consent (GDPR Article 6(1)(a)). You give it by ticking the box on the landing page form, or by choosing
+  "Subscribe and export" in the tuner's prompt. Nothing is ticked or chosen for you.
+- Faust Studio's mailing list is kept in Ecomail, an email service run by ECOMAIL.CZ, s.r.o., Prague, Czechia.
+  Ecomail processes the list on Faust Studio's behalf. Its main servers are in Frankfurt, Germany. Ecomail
+  states that the data is kept in the EU and that some of its suppliers may also send data to the United
+  States under EU-approved transfer arrangements.
+- *link (Outbound):* Ecomail's terms and data-processing agreement (in Czech) → `faust.ecomailTerms`
+  (`https://ecomail.cz/obchodni-podminky/`; replaces `faust.wixPrivacy`, which is deleted. Not Ecomail's
+  privacy policy: that one describes Ecomail's handling of its own customers, report F2 correction 2.)
+- When Faust Studio emails you, the emails go out through Ecomail, which measures how they are read. Each
+  email contains a small invisible image that tells Ecomail when the email is opened, and its links pass
+  through Ecomail so that clicks are counted. Faust Studio can therefore see whether you opened an
+  email, which links you clicked, and when. When an email is opened or a link is clicked, Ecomail also
+  receives your IP address, an approximate location worked out from it, and details of your device and mail
+  program. This is part of what you agree to when you subscribe.
+- (Tracking paragraph: report F1. No emails are being sent yet (2026-11-11), so it is worded as what happens
+  "when Faust Studio emails you"; it is what the person consents to now. It makes no promise that tracking can
+  be switched off, because none is documented. If Faust later finds a way and uses it, the paragraph and both consent sentences change and the
+  versions bump.)
+- Your signup reaches Ecomail through a small relay that Faust Studio runs on Cloudflare (Cloudflare, Inc.,
+  United States). Cloudflare processes the request, including your IP address, on its worldwide network, so
+  it may be handled outside the EU. The relay passes your signup on to Ecomail and stores nothing itself.
+  Transfers to the United States rest on the EU-US Data Privacy Framework. `TODO(verify)`
+- *link (Outbound):* Cloudflare's privacy policy → `faust.cloudflarePrivacy`
+  (`https://www.cloudflare.com/privacypolicy/`)
+- (Cloudflare paragraph: final since 2026-11-11, when the spike chose the Worker (report "Spike results":
+  Ecomail's public form URL sends the visitor to an Ecomail page with Google reCAPTCHA, so it cannot be used;
+  the reCAPTCHA variant drafted here on 2026-11-10 is deleted). Three conditions:
+  the `TODO(verify)` stays until someone opens Cloudflare, Inc.'s entry on the official DPF list in a browser
+  (`https://www.dataprivacyframework.gov/participant/5666`, seen only in secondary copies, report F3);
+  "stores nothing itself" is a build requirement on the Worker, which must not log the email address or the
+  IP, and the clause goes if it does; and Cloudflare's DPA promises no processing location, so never write
+  "in the EU" here. While the Cloudflare account is the user's, "Faust Studio runs" has the same caveat as
+  "on Faust Studio's behalf" for Ecomail.)
+- (No sentence about the signup's IP address. v1's "We don't record your IP address or browser details with
+  your signup" stays out: Ecomail's API record has no IP field (spike), but the dashboard's contact detail has
+  not been checked. If it shows none, add: "The signup itself is stored without your IP address or browser
+  details." If it shows one, add "the IP address the signup came from" to the stored list.)
+- We keep your email address until you unsubscribe or ask us to delete it.
 - Every email we send has an unsubscribe link. You can also withdraw your consent at any time by writing to
   the email address under "Your rights". Withdrawing stops future emails; it doesn't affect what was sent while
   your consent was valid.
@@ -918,14 +1310,23 @@ the `sections` array; the id stays reserved. Its last paragraph ("Nothing on thi
 **6 · `cookies` · No cookies, no tracking**
 - This site sets no cookies, runs no analytics and has no trackers or embedded social media buttons. We don't
   build profiles of you and make no automated decisions about you.
-- Two things are stored in your browser, and only there:
+- Three things are stored in your browser, and only there:
 - *list:*
   - your language choice (English or Czech), saved in your browser's local storage only when you click the
     EN/CS switch
   - the tuner's recent files (see "The tuner" above)
-- Both stay on your device and go away when you clear this site's data.
+  - your answer to the tuner's email prompt, saved only when you answer it, so that you aren't asked again:
+    if you subscribed, in local storage; if you chose not to, in session storage, which your browser clears
+    when you close the tab. It records only which answer you gave, never your email address.
+- All of these stay on your device and go away when you clear this site's data.
 - Nothing on this site is loaded from other companies. The fonts, scripts and images all come from the site
-  itself, so no third party learns that you visited.
+  itself, so no third party learns that you visited. The one time your browser contacts another company from
+  this site is when you subscribe: it then sends your signup to the service described under "Email signup".
+- This section is about the site. The emails you get if you subscribe are measured differently; "Email
+  signup" above explains how.
+- (v2: third list item, "Two" → "Three", "Both" → "All of these", and the last sentence, which is worded to
+  hold for either transport. Re-verify with gate-spec criterion 8. The storage item follows the pm spec's
+  defaults (`faust-landing:gate`); if those change, this item changes.)
 - (The last paragraph was section 4's closing paragraph until that section was removed, 2026-11-04. It depends
   on spec criterion 9, the programmer's zero-other-origin check of the landing page **and** `/tool/`
   (verified at pin `72b353a`). If the tool ever fetches anything external, this paragraph changes; tell the
@@ -951,12 +1352,15 @@ the `sections` array; the id stays reserved. Its last paragraph ("Nothing on thi
 
 **8 · `changes` · Changes to this policy**
 - When this policy changes, the date and version number at the top of the page change with it. The current
-  version is 2026-11-v1.
-- If you subscribed, the version of the consent sentence you agreed to is stored with your email, so we can
+  version is 2026-11-v2.
+- Version 2026-11-v2 changed three things: signups now go to Ecomail instead of Wix, the tuner now offers the
+  signup when you export, and this page now explains how the emails record opens and clicks.
+- If you subscribed, the version of the consent text you agreed to is stored with your email, so we can
   always tell which wording you saw.
+- (v2: version number, the "changed three things" paragraph, and "consent sentence" → "consent text".)
 
 Language-independent values (`src/faust.ts`, not copy): `PRIVACY_URL`, `PRIVACY_POLICY_VERSION`,
-`faust.wixPrivacy`, `faust.uoou` (confirmed by the researcher 2026-11-04; `faust.githubPrivacy` was deleted with
+`faust.ecomailTerms` (v2; replaces `faust.wixPrivacy`), `faust.cloudflarePrivacy` (v2), `faust.uoou` (confirmed by the researcher 2026-11-04; `faust.githubPrivacy` was deleted with
 the hosting section),
 `faust.email`, `faust.privacy`.
 
@@ -1019,6 +1423,11 @@ loaded. Photos are not filtered or tinted. The warmth comes from the photography
       an incomplete attempt explains itself; every state in the §4.8 table is announced through the one
       `role="status"` element; focus lands on the confirmation after success; the honeypot is `aria-hidden`
       with `tabindex="-1"`; the whole form completes keyboard-only in EN and CS.
+- [ ] Export gate (§4.10): opens as a modal over `/tool/` with focus on the heading; Tab cycles email → privacy
+      link → Subscribe → Skip → Close and never reaches the tool; Escape and Close leave without exporting and
+      return focus to Export; the two answers are the same size and both solid; no `disabled` attributes; the
+      dialog carries its own `lang`; the tool's blue focus ring and button styles don't appear inside it;
+      every state in the §4.10 table is announced; no horizontal scroll at 375 px or at 200% text, EN and CS.
 - [ ] Privacy page (§4.9): one h1 and one h2 per section (six while "Who" and "Visiting this site" are removed) in spec order; both back links work; the language switch
       changes the `<title>`; the footer legal row wraps at 375 without horizontal scroll, in CS too.
 

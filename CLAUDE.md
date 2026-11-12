@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-11-04 (privacy policy page).
+Guidance for Claude Code (and humans) working in this repo. Last rewritten 2026-10-20, updated 2026-11-04 (privacy policy page)
+and 2026-11-11 (export email gate + Ecomail, in progress).
 
 ## What this is
 
@@ -44,8 +45,9 @@ site.config.json        THE config: base path + signup endpoint URL + pinned aut
 index.html              landing entry; meta description, title, robots meta
 privacy/index.html      second Vite entry -> /privacy/ (a static file, not a route: Pages has no SPA fallback)
 vite.config.ts          reads base + signupEndpoint from site.config.json (VITE_SIGNUP_ENDPOINT overrides)
-scripts/build-tool.mjs  fetches + builds the pinned autotuner into dist/tool/
-wix/                    the Velo HTTP function Faust pastes into their Wix site + README + test.sh (see Email capture)
+scripts/build-tool.mjs  fetches + builds the pinned autotuner into dist/tool/, then builds src/gate.ts and injects it
+wix/                    the Velo HTTP function for Faust's Wix site + README + test.sh. SUPERSEDED by Ecomail, kept for now
+worker/                 the signup relay (browser -> relay -> Ecomail API). Built, NOT deployed; host undecided
 src/
   App.tsx               section order: Header, Hero, HowItWorks, Studio, NextStep, Faq, Signup, Footer
   privacy.tsx           entry for /privacy/: LangProvider (with the page's own title) + pages/Privacy
@@ -54,6 +56,8 @@ src/
   components.tsx        SectionHead, Outbound link, LangSwitch, etc.
   copy/en.ts, cs.ts     ALL visible text. cs must have the same shape as en (enforced by tsc)
   i18n.tsx              language context: useCopy(), useLang()
+  lang.ts               the language rule + saved key, shared by i18n.tsx and the gate
+  gate.ts, gate.css     the export email gate injected into /tool/ (plain DOM, no React; see Export email gate)
   faust.ts              Faust facts/links + TOOL_URL, PRIVACY_URL, SIGNUP_ENDPOINT, SIGNUP_CONSENT_VERSION,
                         PRIVACY_POLICY_VERSION. brandName = footer wordmark, headerBrandName = header
   vite-env.d.ts         types for import.meta.env.SIGNUP_ENDPOINT
@@ -66,10 +70,12 @@ docs/
   email-capture-spec.md       pm spec for the signup form + Velo endpoint: contract, criteria, task status
   email-capture-migration.md  step-by-step install on Faust's real site, with what failed on the test site
   privacy-policy-spec.md      pm spec for the /privacy/ page: required content (GDPR Art. 13), criteria, tasks
+  email-gate-spec.md          pm spec for the export gate + Ecomail backend: decisions, criteria, task status
 .github/workflows/deploy.yml   GitHub Pages deploy on push to main
 Team-Docs/              proposal, market research, project description, team diagnostic (not site code)
 reports/                research write-ups (Wix integration options, tool theme-colour findings,
-                        privacy-policy-facts.md = sourced facts behind the policy text)
+                        privacy-policy-facts.md = sourced facts behind the policy text,
+                        ecomail-email-gate.md = Ecomail facts, gate legality, endpoint spike results)
 webdesign.md            early design ideas/inspiration (superseded where design-spec.md disagrees)
 TODO.md                 old team todo list (mostly superseded)
 ```
@@ -86,7 +92,8 @@ TODO.md                 old team todo list (mostly superseded)
   tool's `public/`), then `vite build --base=<base>tool/ --outDir dist/tool`. The install is cached per commit
   via a stamp file, so rebuilds take ~1 s.
 - **To ship a new tool version:** change only `autotuner.commit`, then build and preview. Check that the tool
-  still analyses an upload with no 404s. If the tool's look changed, retake the How it works screenshot
+  still analyses an upload with no 404s, and that the export gate still appears when Export is clicked (the
+  build check only proves the button's class names still exist somewhere in the tool's bundle). If the tool's look changed, retake the How it works screenshot
   (`src/assets/howto.png`, design-spec A8), which shows the UI at `e255279`.
 - **Why sub-path hosting works:** the tool loads its model/WASM from `import.meta.env.BASE_URL` and its workers
   via `new URL(..., import.meta.url)`. If the tool team ever hard-codes `/models/...`-style absolute paths, it
@@ -121,7 +128,74 @@ TODO.md                 old team todo list (mostly superseded)
   client-side routes (the language is state, not a URL), and no backend of ours; email collection POSTs to a
   Velo function on Faust's Wix site instead (see Email capture).
 
-## Email capture (added 2026-11-03)
+## Export email gate + Ecomail (added 2026-11-11, IN PROGRESS)
+
+Spec and live task status: `docs/email-gate-spec.md`. Design: design-spec §4.10, copy §5 "Export gate".
+Research, legal reasoning and spike results: `reports/ecomail-email-gate.md`.
+
+- **What it is:** an optional email prompt shown over the tuner when the visitor clicks Export. "Subscribe and
+  export" or "Export without subscribing", two same-size buttons; either way the tool's own export menu then
+  opens. Skipping sends nothing. Nothing in the autotuner repo changes.
+- **Why optional (user decision, 2026-11-10):** a required email has no lawful basis for people who decline
+  marketing (not consent, not contract, and legitimate interest fails necessity; report Part B). Do not make the
+  email required without a Czech lawyer's sign-off. An address without consent is never transmitted anywhere.
+- **How it is built:** `src/gate.ts` + `src/gate.css`, plain DOM in a native `<dialog>`. A separate small Vite
+  step at the end of `scripts/build-tool.mjs` emits `dist/assets/gate-<hash>.js` (CSS inlined) and injects one
+  `<script defer>` before the tool's `</head>`. A capture-phase click listener on `document` catches the tool's
+  Export button (`EXPORT_BUTTON` in `build-tool.mjs`, currently `.export-menu > button.primary`; passed to
+  `gate.ts` as a define), shows the gate, then clicks the button again. The build fails if those class names
+  leave the tool's bundle; at runtime the gate fails open.
+- **Details that were learned, don't re-learn them:** the tool listens for shortcuts on `window`, so the gate
+  stops all `keydown` while open (`inert` is not enough). Style isolation is a `faust-gate-` class namespace
+  (a `<dialog>` cannot host a shadow root). The buttons are a sticky pair at the bottom of the card so both stay
+  visible at 375 px. Storage: subscribed → localStorage `faust-landing:gate`; skipped / failed → sessionStorage
+  (per tab). The email is never stored. Copy is `gate.*` in `copy/en.ts` + `cs.ts`. Run axe after the 150 ms
+  fade-in.
+- **Backend: Ecomail replaces Wix Contacts** (user decision; Blanka finds Wix too awkward for email). Account
+  `courses`, list 1: this is **Faust's final account, not a test one**. Use fake or user-supplied test addresses
+  only and delete them afterwards. The API key is full-access: it lives in gitignored `.env.local` as
+  `ECOMAIL_API_KEY`, never in the page, the repo, built files or a message.
+- **Transport: a small relay** holding the key and calling `POST /lists/{id}/subscribe` on
+  `api2.ecomailapp.cz`. Ecomail's keyless public form URL was tested and rejected (2026-11-11): every POST
+  redirects to an Ecomail robot-check page with Google reCAPTCHA that must run in a visible tab, it refuses
+  framing, and `fetch` creates no contact. Ecomail's API itself refuses browser calls.
+- **The relay is built, not deployed, and its host is undecided (2026-11-12).** Code: `worker/src/signup.js`
+  (host-neutral `handleSignup(request, {apiKey, listId, allowedOrigins})`), with a thin Cloudflare wrapper
+  (`worker/src/index.js`, `wrangler.jsonc`) and `worker/README.md` (contract, local run, deploy steps, moving
+  hosts). Tested locally against the real list; test contacts deleted. The user wants as few external accounts
+  as possible and has not approved Cloudflare; alternatives on the table include a PHP relay or a PHP + database
+  store on Active24 webhosting, where the client's new domain may be hosted (PHP 8.4 and databases confirmed
+  from the plans page; outgoing requests from PHP and the data-centre location are not). The full option table
+  is in the spec. **Don't deploy anything or start a rewrite until the user picks.**
+- **Collect now, send later (user, 2026-11-11):** double opt-in is off at launch because it needs a verified
+  sender domain and the client's new domain is not ready. The relay adds contacts as subscribed with
+  `skip_confirmation: true`, `resubscribe: false`, `update_existing: false`; no email goes out at signup. The
+  shipped texts therefore promise no confirmation email; the with-confirmation wording waits in design-spec §5
+  "Draft for double opt-in" and becomes a new consent version when double opt-in is turned on (before the first
+  campaign).
+- **Relay rules:** it must not log or store the email or IP (the policy says so). An Origin not on the allow-list
+  gets 403. It has no rate limit yet: add one before launch. Custom fields on list 1 now exist: `consent_at`,
+  `consent_version`, `consent_source`, `lang`; Faust must not rename them. Ecomail adds `country: "CZ"` by itself.
+- **Ecomail facts:** double opt-in is per list and needs a verified sender domain (the list's sender is still a
+  Gmail address; verification in progress). A domain can sit in only one Ecomail account. Emails track opens and
+  clicks by default, confirmation email included, with no documented account-wide off switch, so the consent
+  sentences and policy v2 say so. Free plan: about 200 contacts / 200 emails a month; the account is blocked
+  above it. Planned custom fields: `consent_at`, `consent_version`, `consent_source`, `lang`.
+- **State of the working tree (2026-11-12): do not push it as is.** The gate front end is complete and
+  verified on preview (headless Chromium only), and both forms now post to `signupEndpoint`, which is the
+  placeholder `https://signup-worker-not-deployed.invalid/`: every signup shows the failed state (export still
+  works). Privacy policy v2, the v2 consent sentence, FAQ 2 and the final gate copy are applied in `copy/en.ts` /
+  `cs.ts`, and both version constants are `2026-11-v2`, but **verification was cut short** (nothing Czech was
+  checked, nor the gate's export paths on the final copy; see the spec's task 6 row). The policy names
+  Cloudflare as the relay's host in a paragraph marked `TODO(host)` PROVISIONAL: that is not true of anything
+  deployed and must be rewritten for whichever host is chosen. Work is paused on the user's instruction until
+  the hosting decision. Gate, live relay and a verified policy v2 ship in one push.
+- **Still open:** see "Waiting on the user" in the spec.
+
+## Email capture (added 2026-11-03; Wix backend SUPERSEDED 2026-11-10, see the section above)
+
+The landing form (`Signup.tsx`, design-spec §4.8) stays and will post to the same new backend as the gate. The
+Wix parts below describe what is still in the repo and deployed today, not the plan.
 
 Spec: `docs/email-capture-spec.md`. Install guide: `docs/email-capture-migration.md`. Research:
 `reports/Wix Core email capture.md`.
@@ -267,10 +341,17 @@ verbatim, `cs.ts` is the machine draft). Facts behind it: `reports/privacy-polic
 
 ## Open decisions / known gaps
 
-- **Email collection:** solved in principle (see Email capture): emails go to Faust's Wix Contacts. Waiting on
-  Faust: Dev Mode + paste the file (or a collaborator seat) and their custom domain for the origin allow-list.
-  The privacy link no longer waits on Faust (it's our page); their own policy URL is optional (`faust.privacy`). Contacts arrive "Never subscribed"; flipping them is Faust's dashboard toggle.
-  The tool's own email gate is still a stub; it gets the same endpoint contract once Faust's install is verified.
+- **Email collection:** moving from Wix Contacts to Ecomail (see Export email gate + Ecomail). The Wix install on
+  fauststudio.net will not happen. Open: **where the signup relay runs** (built in `worker/`, not deployed;
+  Cloudflare not approved, Active24 webhosting under consideration, see the spec), a rate limit on the relay,
+  sender-domain verification and double opt-in in Ecomail before the first campaign, privacy policy v2 and
+  landing copy v2 (not applied), a paid Ecomail plan before launch, and who at Faust deletes never-confirmed
+  contacts once double opt-in exists. No lawyer has
+  reviewed the gate; email tracking pixels (ePrivacy Art. 5(3)) are on the list for one.
+  The privacy link no longer waits on Faust (it's our page); their own policy URL is optional (`faust.privacy`).
+- **Hosting:** Vercel's free Hobby plan forbids commercial use (found 2026-11-10), so the planned Vercel launch
+  needs a paid plan or another host. Undecided.
+- **Tool at phone width:** `/tool/` scrolls sideways at 375 px (the editor is 481 px wide). Tool team's.
 - **Privacy policy facts:** which Richard Mader / IČO is the controller (founder 10170367 or jr. 01577778, see
   `reports/privacy-policy-facts.md`) is Faust's call. Until they answer, the "Who is responsible" section is
   **removed** from the page (user decision, 2026-11-04); the candidates sit in a comment above `privacy.sections`

@@ -16,7 +16,27 @@ function bindOneLetterWords<T>(value: T): T {
   return value
 }
 
-export const cs: Copy = bindOneLetterWords({
+// TODO(cs-review): machine draft of the export gate copy (`gate` in en.ts); the consent sentence is legal text.
+export const gate: Copy['gate'] = /* @__PURE__ */ bindOneLetterWords({
+  heading: 'Chcete slyšet novinky z Faust Studia?',
+  lead: 'Nechte nám e‑mail a dozvíte se novinky z Faust Studia, pražského nahrávacího studia, které stojí za tímto bezplatným nástrojem, nebo tento krok přeskočte. Export je v obou případech stejný.',
+  emailLabel: 'E‑mail (nepovinný)',
+  consent:
+    'Volbou „{subscribe}“ souhlasíte s tím, že vám Faust Studio může posílat e‑maily o nahrávání ve studiu, kurzech a novinkách nástroje a může vidět, zda e‑maily otevřete a na které odkazy kliknete. Je to dobrovolné a kdykoli se můžete odhlásit.',
+  privacy: 'Zásady ochrany osobních údajů (otevřou se na nové kartě)',
+  subscribe: 'Odebírat a exportovat',
+  sending: 'Přihlašuji…',
+  skip: 'Exportovat bez odběru',
+  invalidEmail: 'Zadejte e‑mailovou adresu ve tvaru jmeno@priklad.cz, nebo zvolte „{skip}“.',
+  close: 'Zavřít',
+  successTitle: 'Díky, jste na seznamu.',
+  successBody: 'Faust Studio vám bude posílat e‑maily o nahrávání ve studiu, kurzech a novinkách nástroje.',
+  failedTitle: 'Přihlášení k odběru se nepodařilo.',
+  failedBody: 'Váš e‑mail se nepodařilo uložit, takže novinky neodebíráte. Na export to nemá vliv.',
+  continue: 'Pokračovat k exportu',
+})
+
+export const cs: Copy = /* @__PURE__ */ bindOneLetterWords({
   meta: {
     title: 'Ladění zpěvu zdarma v prohlížeči · Faust Studio',
   },
@@ -32,7 +52,7 @@ export const cs: Copy = bindOneLetterWords({
     lead: 'Uvidíte každou notu, kterou jste zazpívali, nalaďte je jedním kliknutím nebo ručně a stáhněte si výsledek.',
     cta: 'Vyzkoušet zdarma',
     meta: 'Otevře nástroj · WAV, MP3, OGG nebo FLAC · do 100 MB',
-    // TODO(email): "No account" must change when the tool adds an email step.
+    // TODO(email): true while the export prompt is optional (design-spec §4.10); see en.ts.
     trust: ['Zdarma', 'Bez registrace', 'Nahrávka zůstává ve vašem zařízení'],
     mobileNote: 'Úpravy nejlépe fungují na notebooku nebo počítači.',
     dropMessage: 'Skoro: otevřete nástroj a soubor přetáhněte tam.',
@@ -119,8 +139,11 @@ export const cs: Copy = bindOneLetterWords({
     heading: 'Otázky',
     items: [
       { q: 'Je to zdarma?', a: 'Ano. Nahrát, naladit i stáhnout můžete zdarma.' },
-      // TODO(email): placeholder until the tool team decides on email. Don't promise "email only at download".
-      { q: 'Potřebuji účet?', a: 'Teď ne. Nástroj můžete používat bez registrace.' },
+      // TODO(email): true while the export prompt is optional (design-spec §4.10); rewrite if an email ever becomes required.
+      {
+        q: 'Potřebuji účet?',
+        a: 'Ne. Není tu žádný účet a k ničemu se neregistrujete. Při exportu se vás nástroj zeptá, zda chcete dostávat e‑maily od Faust Studia. Můžete odmítnout a exportovat úplně stejně.',
+      },
       {
         q: 'Nahrává se můj zvuk někam?',
         a: 'Ne. Nástroj běží celý ve vašem prohlížeči a vaše nahrávka se nikdy neposílá nám ani nikomu jinému. Nedávné soubory zůstávají uložené v tomto prohlížeči na tomto zařízení, abyste je mohli znovu otevřít. Kdykoli je můžete smazat.',
@@ -140,13 +163,14 @@ export const cs: Copy = bindOneLetterWords({
       },
     ],
   },
-  // TODO(cs-review): consent sentence must keep the three facts of the EN one (who emails, about what, unsubscribe any time).
+  // TODO(cs-review): consent sentence (version 2026-11-v2) must keep the facts of the EN one (who emails, about what,
+  // that opens and clicks are seen, unsubscribe any time).
   signup: {
     eyebrow: 'Zůstaňte v kontaktu',
     heading: 'Novinky ze studia',
     lead: 'Nechte nám e‑mail a dozvíte se o nahrávání ve studiu, kurzech a novinkách nástroje. Nástroj zůstává zdarma, s e‑mailem i bez něj.',
     emailLabel: 'E‑mail',
-    consent: 'Faust Studio mi může posílat e‑maily o nahrávání ve studiu, kurzech a novinkách nástroje a mohu se kdykoli odhlásit.',
+    consent: 'Faust Studio mi může posílat e‑maily o nahrávání ve studiu, kurzech a novinkách nástroje a může vidět, zda e‑maily otevřu a na které odkazy kliknu. Mohu se kdykoli odhlásit.',
     privacy: 'Zásady ochrany osobních údajů',
     submit: 'Odebírat novinky',
     submitting: 'Odesílám…',
@@ -158,6 +182,7 @@ export const cs: Copy = bindOneLetterWords({
     successTitle: 'Díky, jste na seznamu.',
     successBody: 'Faust Studio vám bude posílat e‑maily o nahrávání ve studiu, kurzech a novinkách nástroje.',
   },
+  gate,
   footer: {
     description: 'Nahrávací studio, rezidenční a tvůrčí prostor nedaleko Pražského hradu. Od roku 1991.',
     contactLabel: 'Kontakt',
@@ -177,18 +202,20 @@ export const cs: Copy = bindOneLetterWords({
     back: 'Zpět na stránku nástroje',
     eyebrow: 'Faust Studio · ladění zpěvu',
     heading: 'Ochrana osobních údajů',
-    updated: `Poslední aktualizace 4. listopadu 2026 · Verze ${PRIVACY_POLICY_VERSION}`,
+    updated: `Poslední aktualizace 12. listopadu 2026 · Verze ${PRIVACY_POLICY_VERSION}`,
     intro:
       'Tato stránka vysvětluje, co se děje s vašimi daty, když používáte bezplatný nástroj na ladění zpěvu a web kolem něj, a co si Faust Studio uchová, pokud nám necháte svůj e-mail. Stručně: nástroj pracuje výhradně ve vašem prohlížeči a vaše nahrávka nikdy neopustí vaše zařízení. Vaši e-mailovou adresu ukládáme jen tehdy, když se přihlásíte k odběru, a odběr můžete kdykoli zrušit.',
     seeAlso: 'Viz také: zásady ochrany osobních údajů Faust Studia',
     // Části „Kdo za zpracování odpovídá“ a „Návštěva tohoto webu“ jsou odstraněny (viz komentář v en.ts).
+    // TODO(cs-review): version 2026-11-v2 is a machine draft of LEGAL text; a native speaker must review it before the
+    // site leaves noindex. The source comments (TODO(host), TODO(verify)) are in en.ts and apply here too.
     sections: [
       {
         id: 'scope',
         heading: 'Čeho se tato stránka týká',
         blocks: [
-          'Tyto zásady se týkají tří věcí: úvodní stránky nástroje, samotného nástroje na adrese /tool/ a formuláře pro přihlášení k e-mailům na úvodní stránce.',
-          'Netýkají se webu fauststudio.net, hlavního webu Faust Studia, který je provozován samostatně. Weby, na které odkazujeme (Wix, Instagram, Facebook), mají vlastní zásady ochrany osobních údajů.',
+          'Tyto zásady se týkají úvodní stránky nástroje, samotného nástroje na adrese /tool/ a dvou míst, kde můžete zanechat svůj e-mail: formuláře na úvodní stránce a výzvy, která se zobrazí při exportu z nástroje.',
+          'Netýkají se webu fauststudio.net, hlavního webu Faust Studia, který je provozován samostatně. Weby, na které odkazujeme (Ecomail, Instagram, Facebook), mají vlastní zásady ochrany osobních údajů.',
         ],
       },
       {
@@ -198,6 +225,7 @@ export const cs: Copy = bindOneLetterWords({
           'Nástroj běží výhradně ve vašem prohlížeči. Když otevřete zvukový soubor, váš prohlížeč ho dekóduje, najde noty, použije vaše úpravy a vytvoří soubor ke stažení, to vše ve vašem zařízení. Nic se nenahrává na server: ani nahrávka, ani název souboru, ani to, co jste změnili. Není tu žádný účet ani přihlášení.',
           'Abyste mohli soubor později znovu otevřít, nástroj si otevřené soubory uchovává ve vlastním úložišti vašeho prohlížeče (IndexedDB) ve vašem zařízení. Číst je může jen váš prohlížeč a nikam se neodesílají.',
           'Odstraníte je vymazáním dat tohoto webu v nastavení soukromí vašeho prohlížeče (obvykle pod „Cookies a data webů“ nebo „Data webových stránek“). Totéž udělejte, pokud jste nástroj používali na sdíleném počítači.',
+          'Při exportu se vás nástroj zeptá, zda chcete dostávat e-maily od Faust Studia. Je to dobrovolné. Je to jediný okamžik, kdy nástroj může cokoli kamkoli odeslat, a odesílá pouze vaši e-mailovou adresu, a to jen tehdy, když se rozhodnete pro odběr (viz „Přihlášení k e-mailům“ níže). Vaše nahrávka součástí není nikdy.',
         ],
       },
       {
@@ -205,20 +233,27 @@ export const cs: Copy = bindOneLetterWords({
         heading: 'Přihlášení k e-mailům',
         blocks: [
           'Zanechat e-mail je dobrovolné. Nástroj je zdarma a funguje úplně stejně s ním i bez něj.',
+          'Ptáme se na dvou místech: ve formuláři na úvodní stránce a ve výzvě, která se zobrazí při exportu z nástroje. Pokud výzvu zavřete nebo exportujete bez odběru, nic se nám neodešle a vše, co jste napsali do pole pro e-mail, se zahodí.',
           'Pokud se přihlásíte k odběru, Faust Studio uloží:',
           [
             'vaši e-mailovou adresu',
             'jazyk, který jste používali (angličtina nebo čeština)',
-            'datum a čas, kdy jste zaškrtli políčko souhlasu',
-            'verzi věty se souhlasem, se kterou jste souhlasili',
-            'ze které stránky jste se přihlásili',
+            'datum a čas přihlášení k odběru',
+            'verzi textu souhlasu, se kterou jste souhlasili',
+            'kde jste se přihlásili (úvodní stránka nebo nástroj)',
           ],
-          'K vašemu přihlášení nezaznamenáváme IP adresu ani údaje o prohlížeči.',
-          'Údaje používáme k tomu, abychom vám e-mailem posílali novinky o studiových nahrávkách, kurzech a nástroji. Právním základem je váš souhlas (čl. 6 odst. 1 písm. a) GDPR), který dáváte zaškrtnutím políčka. Políčko není nikdy předem zaškrtnuté.',
-          'Seznam kontaktů Faust Studia je uložen ve Wixu, platformě, která hostuje fauststudio.net. Společnost Wix.com Ltd. se sídlem v Izraeli ho zpracovává jménem Faust Studia a ukládá ho v datových centrech ve Spojených státech a Irsku. EU uznává Izrael za zemi s odpovídající úrovní ochrany údajů; předání do Spojených států je kryto standardními smluvními doložkami EU podle podmínek zpracování údajů společnosti Wix.',
-          { label: 'Zásady ochrany soukromí Wixu', href: faust.wixPrivacy },
+          'Na nic dalšího se neptáme: žádné jméno, žádný účet, žádné heslo.',
+          'Po přihlášení je vaše adresa do seznamu přidána ihned. Potvrzovací e-mail neposíláme.',
+          `Vaši adresu používáme k tomu, abychom vám e-mailem posílali novinky o nahrávání ve studiu, kurzech a nástroji. Právním základem je váš souhlas (čl. 6 odst. 1 písm. a) GDPR). Dáváte ho zaškrtnutím políčka ve formuláři na úvodní stránce, nebo volbou „${gate.subscribe}“ ve výzvě nástroje. Nic není zaškrtnuto ani zvoleno za vás.`,
+          'Seznam odběratelů Faust Studia je veden v Ecomailu, e-mailové službě provozované společností ECOMAIL.CZ, s.r.o., Praha, Česko. Ecomail seznam zpracovává jménem Faust Studia. Jeho hlavní servery jsou ve Frankfurtu v Německu. Ecomail uvádí, že data jsou uchovávána v EU a že někteří jeho dodavatelé mohou data předávat také do Spojených států na základě mechanismů předávání schválených EU.',
+          { label: 'Obchodní podmínky a zpracovatelská smlouva Ecomailu', href: faust.ecomailTerms },
+          'Když vám Faust Studio posílá e-maily, odcházejí přes Ecomail, který měří, jak jsou čteny. Každý e-mail obsahuje malý neviditelný obrázek, který Ecomailu sdělí, kdy byl e-mail otevřen, a odkazy v něm vedou přes Ecomail, aby se počítala kliknutí. Faust Studio proto vidí, zda jste e-mail otevřeli, na které odkazy jste klikli a kdy. Při otevření e-mailu nebo kliknutí na odkaz Ecomail získá také vaši IP adresu, z ní odvozenou přibližnou polohu a údaje o vašem zařízení a poštovním programu. Je to součást toho, s čím při přihlášení k odběru souhlasíte.',
+          // TODO(host): PROVISIONAL, like the EN paragraph: rewrite for whichever host the relay ends up on.
+          // TODO(verify): the Data Privacy Framework sentence (see en.ts).
+          'Vaše přihlášení se do Ecomailu dostane přes malou předávací službu, kterou Faust Studio provozuje na Cloudflare (Cloudflare, Inc., Spojené státy). Cloudflare požadavek včetně vaší IP adresy zpracovává ve své celosvětové síti, takže může být zpracován i mimo EU. Předávací služba vaše přihlášení předá Ecomailu a sama nic neukládá. Předávání do Spojených států se opírá o Rámec EU–USA pro ochranu osobních údajů.',
+          { label: 'Zásady ochrany osobních údajů Cloudflare (anglicky)', href: faust.cloudflarePrivacy },
           // TODO(verify): Faust must confirm they delete on request (handover note in docs/email-capture-migration.md).
-          'Váš e-mail uchováváme, dokud se neodhlásíte nebo nás nepožádáte o jeho smazání.',
+          'Vaši e-mailovou adresu uchováváme, dokud se neodhlásíte nebo nás nepožádáte o její smazání.',
           'Každý e-mail, který posíláme, obsahuje odkaz pro odhlášení. Souhlas můžete také kdykoli odvolat e-mailem na adresu uvedenou v části „Vaše práva“. Odvolání zastaví další e-maily; netýká se toho, co bylo odesláno, dokud váš souhlas platil.',
         ],
       },
@@ -227,13 +262,15 @@ export const cs: Copy = bindOneLetterWords({
         heading: 'Žádné cookies, žádné sledování',
         blocks: [
           'Tento web nenastavuje žádné cookies, neprovozuje žádnou analytiku a nemá žádné sledovací prvky ani vložená tlačítka sociálních sítí. Nevytváříme o vás profily a neděláme o vás žádná automatizovaná rozhodnutí.',
-          'Ve vašem prohlížeči, a pouze tam, se ukládají dvě věci:',
+          'Ve vašem prohlížeči, a pouze tam, se ukládají tři věci:',
           [
             'vaše volba jazyka (angličtina nebo čeština), uložená v místním úložišti prohlížeče jen tehdy, když kliknete na přepínač EN/CS',
             'nedávné soubory nástroje (viz „Nástroj“ výše)',
+            'vaše odpověď na e-mailovou výzvu nástroje, uložená jen tehdy, když na ni odpovíte, abychom se vás neptali znovu: pokud jste se přihlásili k odběru, v místním úložišti; pokud jste odběr odmítli, v úložišti relace, které prohlížeč vymaže, když zavřete kartu. Zaznamenává jen to, jak jste odpověděli, nikdy vaši e-mailovou adresu.',
           ],
-          'Obojí zůstává ve vašem zařízení a zmizí, když vymažete data tohoto webu.',
-          'Nic na tomto webu se nenačítá od jiných společností. Písma, skripty i obrázky pocházejí ze samotného webu, takže se žádná třetí strana nedozví, že jste ho navštívili.',
+          'To vše zůstává ve vašem zařízení a zmizí, když vymažete data tohoto webu.',
+          'Nic na tomto webu se nenačítá od jiných společností. Písma, skripty i obrázky pocházejí ze samotného webu, takže se žádná třetí strana nedozví, že jste ho navštívili. Jediný okamžik, kdy váš prohlížeč z tohoto webu kontaktuje jinou společnost, je přihlášení k odběru: tehdy odešle vaše přihlášení službě popsané v části „Přihlášení k e-mailům“.',
+          'Tato část se týká webu. E-maily, které dostáváte, pokud se přihlásíte k odběru, se měří jinak; jak, vysvětluje část „Přihlášení k e-mailům“ výše.',
         ],
       },
       {
@@ -262,7 +299,8 @@ export const cs: Copy = bindOneLetterWords({
         heading: 'Změny těchto zásad',
         blocks: [
           `Když se tyto zásady změní, změní se s nimi i datum a číslo verze v horní části stránky. Aktuální verze je ${PRIVACY_POLICY_VERSION}.`,
-          'Pokud jste se přihlásili k odběru, verze věty se souhlasem, se kterou jste souhlasili, je uložena spolu s vaším e-mailem, takže vždy víme, jaké znění jste viděli.',
+          'Verze 2026-11-v2 změnila tři věci: přihlášení nyní směřují do Ecomailu místo Wixu, nástroj nyní nabízí přihlášení při exportu a tato stránka nyní vysvětluje, jak e-maily zaznamenávají otevření a kliknutí.',
+          'Pokud jste se přihlásili k odběru, verze textu souhlasu, se kterou jste souhlasili, je uložena spolu s vaším e-mailem, takže vždy víme, jaké znění jste viděli.',
         ],
       },
     ],
